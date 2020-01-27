@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "AstroRide",
+    "description": "Ride hailing app",
+    "slug": "astro-ride-app",
+    "privacy": "public",
+    "sdkVersion": "36.0.0",
+    "platforms": [
+      "android"
+    ],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#80ff80"
+    },
+    "notification": {
+      "icon": "./assets/images/notification.png"
+    },
+    "updates": {
+      "enabled": true
+    },
+    "assetBundlePatterns": [
+      "assets/**/*"
+    ],
+    "android": {
+      "package": "com.primetech.astro",
+      "permissions": [
+        "NOTIFICATIONS"
+      ]
+    }
+  }
+}
