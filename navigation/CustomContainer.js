@@ -2,7 +2,7 @@ import React,{useContext} from 'react';
 import { View } from 'react-native';
 import {ThemeContext,UserContext} from '../MyContexts';
 import { createAppContainer } from 'react-navigation';
-import AppNavigator from './AppNavigator';
+//import AppNavigator from './AppNavigator';
 import GuestNavigator from './GuestNavigator';
 import * as helpers from '../Helpers';
 import {NavigationEvents} from 'react-navigation';

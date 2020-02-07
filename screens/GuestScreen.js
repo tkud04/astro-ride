@@ -5,6 +5,7 @@ import Card from '../components/Card';
 import AppHomeHeader from '../components/AppHomeHeader';
 import CButton from '../components/CButton';
 import * as helpers from '../Helpers';
+import {SvgXml} from 'react-native-svg';
 import AppStyles from '../styles/AppStyles';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
@@ -28,8 +29,18 @@ static navigationOptions = {
   };
 
 _continue = () => {
+		/**
 		showMessage({
 			 message: `Going to add phone number screen!`,
+			 type: 'info'
+		 });
+		 **/
+		 
+		 this.navv.navigate('AddNumber');  
+}
+_continueSocial = () => {
+		showMessage({
+			 message: `Going to social screen!`,
 			 type: 'info'
 		 });
 }
@@ -43,8 +54,11 @@ _continue = () => {
     return (
 	        <Container>
 					   <Column1>					   
-					      <LogoView>
+					      <LogoView>						   
 						    <Logo>
+							  <LogoIcon>
+							     <SvgXml xml={helpers.insertAppStyle(AppStyles.svg.logoCar)} fill="black" width={50} height={50} /> 
+							  </LogoIcon>
 							  <LogoText>AstroRide</LogoText>
 							</Logo>
 						  </LogoView>
@@ -56,15 +70,20 @@ _continue = () => {
 							style={{width: '100%'}}
 					          onPress={() => {this._continue()}}
 					        >
-						      <CButton title="Click here" background="blue" color="#fff" />
+						      <CButton title="Click here" background="rgb(101, 33, 33)" color="#fff" />
 							</ContinueButton>
 						  </PhoneView>
 						
 					   </Column1>
 					   <Column2>
+					    <ContinueButton
+							style={{width: '100%'}}
+					          onPress={() => {this._continueSocial()}}
+					    >
 					       <SocialView>
 					         <SocialText>Or connect with social</SocialText>
 						   </SocialView>
+						</ContinueButton>
 					   </Column2>
 			</Container>
     );
@@ -96,7 +115,7 @@ const LogoText = styled.Text`
 
 const SocialText = styled.Text`
                      font-size: 15;
-					 color: #0000ff;
+					 color: rgb(101, 33, 33);
 					 margin-left: 10px;
 `;
 
@@ -116,16 +135,21 @@ const PhoneHeaderView = styled.View`
 
 
 const LogoView = styled.View`
-               	 background-color: #0000ff;
+               	 background-color: rgb(101, 33, 33);
                  flex: 2;
 				 align-items: center;
                  justify-content: center;
+`;
+
+const LogoIcon = styled.View`
+
 `;
 
 const Logo = styled.View`
                	 background-color: #fff;
                  width: 40%;
                  height: 40%;
+				 border-radius: 33px;
                  align-items: center;
                  justify-content: center;				 
 `;

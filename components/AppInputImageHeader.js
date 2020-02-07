@@ -9,7 +9,7 @@ import * as helpers from '../Helpers';
 const AppInputImageHeader = props => {
 return (
 <Container>
-<BackgroundImage source={require('../assets/images/header.jpg')}>
+<BackgroundImage source={require('../assets/images/header.png')}>
 </BackgroundImage>
 <OverlayView pointerEvents="none"></OverlayView>
 <HeaderView>
@@ -96,5 +96,5 @@ top: 0;
 left: 0;
 right: 0;
 bottom: 0;
-background-color: rgba(0,100,0,0.5);
+background-color: rgba(101, 33, 33,0.5);
 `;

@@ -6,6 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Permissions from 'expo-permissions';
 import Constants from 'expo-constants';
 import { Notifications } from 'expo';
+//import RNPaystack from 'react-native-paystack';
 import {showMessage, hideMessage} from 'react-native-flash-message';
  
   export async function download(url){
@@ -31,17 +32,15 @@ import {showMessage, hideMessage} from 'react-native-flash-message';
     return false;
 }
   
-    export async function handlePostMessageAsync(msgg){
-	  let uu = ""; //main url to launch in browser  
-	  let uc = ""; //user cookie
-	  let au = "" //active user
-	  
+    export async function handlePostMessageAsync(msgg){	  
 	  console.log("posted message: " + msgg);
 	  parsedMsg = this.tryParseJSON(msgg);
+	  console.log("parsed message: " + parsedMsg);
 	  
+	  /**
 	  if(parsedMsg){
 		  console.log("parsed message\n\nschool code: " + parsedMsg.userCook + "\nusername: " + parsedMsg.activeUser);
-          uc = parsedMsg.userCook;	  
+          uc = parsedMsg.userCook; 	  
           au = parsedMsg.activeUser;	  
           cid = parsedMsg.cid;	  
 		//this.setState({userCook: parsedMsg.userCook,activeUser: parsedMsg.activeUser});
@@ -60,60 +59,8 @@ import {showMessage, hideMessage} from 'react-native-flash-message';
 	  }
 	  else{
 		   this.download(postData);
-		 /*
-	  let msgArr = postData.split('|');
-	  //let result = null;
-	  
-	  if(msgArr[0] == "report"){
-		  uu = msgArr[1];
-		  ffname = FileSystem.documentDirectory + "eschoolng.pdf";
-		   console.log("report card script to download: " + uu);
-           this.download(uu);
 	  }
-	  else if(msgArr[0] == "assignment"){
-		  msg = msgArr[1];
-		  let nmsg = msg.substr(3);
-	      uu = "https://eschoolng.net/" + uc + "/" + nmsg;
-		   console.log("assignment file to download: " + uu);
-	      fnameArr =  msg.split('/');
-	      ffname = FileSystem.documentDirectory + fnameArr[3];	  
-          this.download(uu);
-	  }
-	  
-	  */
-	  
-	  /**
-	  else if(msgArr[0] == "assignment"){
-		  msg = msgArr[1];
-		  let nmsg = msg.substr(3);
-	      uu = "https://eschoolng.net/berkley/" + nmsg;
-		   console.log("assignment file to download: " + uu);
-	      fnameArr =  msg.split('/');
-	      ffname = FileSystem.documentDirectory + fnameArr[3];
-		  
-		  let result = await WebBrowser.openBrowserAsync(uu);
-	  if(result.type == "opened"){
-		  dmb = WebBrowser.dismissBrowser();
-	  }
-	  console.log(result);
-	  }
-	  
-
-	
-	 //alert(msg);
-	 
-	 //We have the URI, download the file to Documents
-	 
-	 //iOS
-	 /*
-	 if(Platform.OS === 'ios'){
-	 
-     }
-     else if(Platform.OS === 'android'){
-		 CameraRoll.saveToCameraRoll( uu, 'photo');
-	 }	 
-	 **/
-	  }
+	  **/
    }
   
   
@@ -267,7 +214,7 @@ export async function logout(callback) {
 	let ret = {status: "Unknown"};
 	 try{
 	 //**
-	 await AsyncStorage.removeItem('ivtry_user');
+	 await AsyncStorage.removeItem('astrd_user');
 	  await AsyncStorage.removeItem('products');
 	  await AsyncStorage.removeItem('customers');
 	  //**/
@@ -286,7 +233,7 @@ export async function saveData(dt){
 	console.log(dt);
 	
 	
-	await AsyncStorage.setItem('ivtry_user',JSON.stringify(dt.user))
+	await AsyncStorage.setItem('astrd_user',JSON.stringify(dt.user))
 	                  .then(() => {
 						  console.log("user profile saved");
 					  })
@@ -339,6 +286,9 @@ export function getList(callback){
 
 export async function addProduct(data,n)
 {
+	data.createdAt = getDate();
+	data.updatedAt = getDate();
+	
 	let products = await AsyncStorage.getItem('products');
 	let newProduct = JSON.parse(products);
 	
@@ -363,6 +313,7 @@ export async function addProduct(data,n)
 
 export async function updateProduct(data,n) 
 {
+	data.updatedAt = getDate();
 	let products = await AsyncStorage.getItem('products');
 	let newProduct = JSON.parse(products);
 	let updatedProducts = [];
@@ -420,6 +371,9 @@ export async function getProducts(callback)
 export async function addCustomer(data,n)
 {
 	data.id = generateID('customer');
+	data.createdAt = getDate();
+	data.updatedAt = getDate();
+	
 	let customers = await AsyncStorage.getItem('customers');
 	let newCustomers = JSON.parse(customers);
 	
@@ -461,6 +415,7 @@ export async function getCustomers(callback)
 
 export async function updateCustomer(data,n)
 {
+	data.updatedAt = getDate();
 	let customers = await AsyncStorage.getItem('customers');
 	let newCustomers = JSON.parse(customers);
 	let updatedCustomers = [];
@@ -501,6 +456,8 @@ export async function addSale(data,n)
 	data.id = generateID('sale');
 	data.status = "ok"; 
 	data.date = getDate();
+	data.createdAt = getDate();
+	data.updatedAt = getDate();
 	let sales = await AsyncStorage.getItem('sales');
 	let newSale = JSON.parse(sales);
 	
@@ -536,12 +493,14 @@ export async function getSales(callback)
 	}
 	catch(error){
 		console.log(error);
+		callback({});
 	}
 	
 }
 
 export async function updateSale(data,n)
 {
+	data.updatedAt = getDate();
 	let sales = await AsyncStorage.getItem('sales');
 	let newSale = JSON.parse(sales);
 	let updatedSales = [];
@@ -673,7 +632,7 @@ export async function getLoggedInUser(){
 	let ret = {};
 
 	try{
-		let uuu = await AsyncStorage.getItem('ivtry_user');
+		let uuu = await AsyncStorage.getItem('astrd_user');
 		//console.log(customers);
 		if(uuu !== null){
 			let ret = JSON.parse(uuu);
@@ -693,7 +652,7 @@ export async function getLoggedInUser2(callback){
 	let ret = {id: 0, name: "Guest"};
 
 	try{
-		let uuu = await AsyncStorage.getItem('ivtry_user');
+		let uuu = await AsyncStorage.getItem('astrd_user');
 		//console.log(customers);
 		if(uuu !== null){
 			let ret = JSON.parse(uuu);
@@ -925,3 +884,273 @@ export function compareDates(str1, str2,type){
    console.log("x: ",x);
  return x;
 }
+
+export function getTotal(products){
+	let ret = 0;
+	
+	for(let i = 0; i < products.length; i++){
+		let p = products[i];
+		//console.log(`sp: ${parseInt(p.sellingPrice)}, qty: ${parseInt(p.qty)}, shipping: ${parseInt(p.shipping)}`);
+		ret += (  parseInt(p.sellingPrice) * parseInt(p.qty) );
+	}
+	
+	return ret;
+	
+}
+
+export function getProfit(products){
+	let ret = 0;
+	
+	for(let i = 0; i < products.length; i++){
+		let p = products[i];
+		ret += parseInt(p.profit);
+	}
+	
+	return ret;
+	
+}
+
+export function chargeCard(cardParams){
+//fetch request
+	fetch(req)
+	   .then(response => {
+		   if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Network error"};
+		   }
+	   })
+	   .catch(error => {
+		    alert("Failed to send message: " + error);			
+	   })
+	   .then(res => {
+		   callback(res); 
+		   
+		   
+	   }).catch(error => {
+		    alert("Unknown error: " + error);			
+	   });
+}
+
+export function initializeTransaction(data){
+	let initialize_url = "https://api.paystack.co/transaction/initialize/";
+	
+	return fetch(initialize_url, {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+    'Content-Type': 'application/json',
+    'authorization': 'Bearer sk_test_ba85038cb3b6a55e707404a245ad36108a9f2225',
+    'cache-control': 'no-cache'
+  },
+      body: JSON.stringify(data)
+  })
+  .then(response => {
+  	//console.log(response);
+	    return response;
+	})
+	.then(response => {
+	    //console.log(response);
+         if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Couldn't initialize transaction"};
+		   }
+		   })
+    .catch(error => {
+    	   return {status: "error:", message: `Failed to initialize transaction: ${error}`};
+	   });
+  /**
+  .then(response => {
+	    //console.log(response);
+         if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Couldn't fetch signup URL"};
+		   }
+		   })
+    .catch(error => {
+		   console.log(`Failed to fetch push endpoint ${PUSH_ENDPOINT}: ${error}`);		
+	   })
+	   .then(res => {
+		   console.log(res); 
+		   res.tk = token;
+		   callback(res);
+		   
+	   }).catch(error => {
+		   console.log(`Unknown error: ${error}`);			
+	   });
+	**/
+}
+
+/* repeatString() returns a string which has been repeated a set number of times */
+function repeatString(str, num) {
+    out = '';
+    for (var i = 0; i < num; i++) {
+        out += str;
+    }
+    return out;
+}
+
+/*
+dump() displays the contents of a variable like var_dump() does in PHP. dump() is
+better than typeof, because it can distinguish between array, null and object.
+Parameters:
+    v:              The variable
+    howDisplay:     "none", "body", "alert" (default)
+    recursionLevel: Number of times the function has recursed when entering nested
+                    objects or arrays. Each level of recursion adds extra space to the
+                    output to indicate level. Set to 0 by default.
+Return Value:
+    A string of the variable's contents
+Limitations:
+    Can't pass an undefined variable to dump(). 
+    dump() can't distinguish between int and float.
+    dump() can't tell the original variable type of a member variable of an object.
+    These limitations can't be fixed because these are *features* of JS. However, dump()
+*/
+export function dump(v, howDisplay, recursionLevel) {
+    howDisplay = (typeof howDisplay.type === 'undefined') ? {type: "alert"} : howDisplay;
+    recursionLevel = (typeof recursionLevel !== 'number') ? 0 : recursionLevel;
+
+    var vType = typeof v;
+    var out = vType;
+
+    switch (vType) {
+        case "number":
+        /* there is absolutely no way in JS to distinguish 2 from 2.0
+           so 'number' is the best that you can do. The following doesn't work:
+           var er = /^[0-9]+$/;
+           if (!isNaN(v) && v % 1 === 0 && er.test(3.0)) {
+               out = 'int';
+           }
+        */
+        break;
+    case "boolean":
+        out += ": " + v;
+        break;
+    case "string":
+        out += "(" + v.length + '): "' + v + '"';
+        break;
+    case "object":
+        //check if null
+        if (v === null) {
+            out = "null";
+        }
+        //If using jQuery: if ($.isArray(v))
+        //If using IE: if (isArray(v))
+        //this should work for all browsers according to the ECMAScript standard:
+        else if (Object.prototype.toString.call(v) === '[object Array]') {
+            out = 'array(' + v.length + '): {\n';
+            for (var i = 0; i < v.length; i++) {
+                out += repeatString('   ', recursionLevel) + "   [" + i + "]:  " +
+                    dump(v[i], "none", recursionLevel + 1) + "\n";
+            }
+            out += repeatString('   ', recursionLevel) + "}";
+        }
+        else {
+            //if object
+            let sContents = "{\n";
+            let cnt = 0;
+            for (var member in v) {
+                //No way to know the original data type of member, since JS
+                //always converts it to a string and no other way to parse objects.
+                sContents += repeatString('   ', recursionLevel) + "   " + member +
+                    ":  " + dump(v[member], "none", recursionLevel + 1) + "\n";
+                cnt++;
+            }
+            sContents += repeatString('   ', recursionLevel) + "}";
+            out += "(" + cnt + "): " + sContents;
+        }
+        break;
+    default:
+        out = v;
+        break;
+    }
+
+    if (howDisplay.type == 'body') {
+        var pre = document.getElementById(howDisplay.elem);
+        pre.innerHTML = out;
+       // document.body.appendChild(pre);
+    }
+    else if (howDisplay.type == 'alert') {
+       // alert(out);
+    }
+
+    return out;
+}
+
+export function focusTextInput(node){
+	try{
+		node.focus();
+	}
+	catch(e){
+		console.log("Couldn't focus text input: ",e.message);
+	}
+}
+
+export function formatPhoneNumber(number){
+	return number;
+}
+
+export function sendSMSAsync(dt,navv){
+		//let id= "38973", secret = "vZXZJbO0BcElg7WnelONbohkhPdDI8Pd7M", pass = "QX1RzewUuERRScGGo4XImNVZv4OJbAW2yXU7bq1G4S";
+		let id= "39026", secret = "VXCVcIu0nkrj5sU5log4kTYP7oJTORDKPfF1Y91lusFzV", pass = "EhZUlkOjaVIUPwLshAIWBG6D2A5I91jNiiIECwYMrHGhds";
+		let senderid = "AstroRide", to = dt.to, msg = `Your code is ${dt.code}`;
+    //let uu = `http://astroride.padisoft.org/smsapi?pd_m=send&id=${id}&secret=${secret}&pass=${pass}&senderID=${senderid}&to_number=${to}&textmessage=${msg}&free=1`;
+    let uu = `http://disenado.padisoft.org/smsapi?pd_m=send&id=${id}&secret=${secret}&pass=${pass}&senderID=${senderid}&to_number=${to}&textmessage=${msg}&free=1`;
+   console.log("uu: ",uu);
+   fetch(uu, {
+    method: 'GET',
+    mode: 'cors'
+  })
+  .then(response => {
+  	if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.text();
+		   }
+		   else{
+			   return "Couldn't send sms";
+		   }
+		   })
+    .catch(error => {
+		   console.log(`Failed to send sms: ${error}`);		
+	   })
+	   .then(res => {
+		   console.log("sms result: ",res);
+           let xx = res.split(' '); 	
+            console.log("xx: ",xx);		   
+		   
+		   if(xx[1] === "9000"){
+			   navv.navigate('VerifyNumber',{
+		          dt: dt
+	          } );
+		   }
+		   else{
+			   showMessage({
+			 message: "Something went wrong. Please try again.",
+			 type: 'danger'
+		 });
+		   }
+		   
+	   }).catch(error => {
+		   console.log(`Unknown error: ${error}`);			
+	   });
+	
+
+}
+
+export function getCode(){
+	return Math.floor(Math.random() * (9999 - 1001 + 1) + 1001);
+}
+ 

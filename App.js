@@ -24,6 +24,7 @@ constructor(props){
 	
 	this.state = {
     isLoadingComplete: false,
+    isRealLoadingComplete: false,
 	user:  {},
 	ttk: null,
 	up: this._updateUser,
@@ -61,7 +62,7 @@ resolve = async (pr) => {
 
   render() {
    
-    if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
+    if (!this.state.isRealLoadingComplete && !this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
       return (
         <AppLoading
           startAsync={this._loadResourcesAsync}
@@ -74,8 +75,10 @@ resolve = async (pr) => {
 		
 		  helpers.getLoggedInUser().then((dt) => {
 			  this.state.user = dt;					  
+			  this.state.isRealLoadingComplete = true;
 			  console.log("uu",this.state.user);
 			  this.state.up([this.state.user]);
+			  
 			 
 		 });
 		  return (

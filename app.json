@@ -14,7 +14,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#80ff80"
+      "backgroundColor": "#652121"
     },
     "notification": {
       "icon": "./assets/images/notification.png"
