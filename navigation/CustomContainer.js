@@ -2,7 +2,7 @@ import React,{useContext} from 'react';
 import { View } from 'react-native';
 import {ThemeContext,UserContext} from '../MyContexts';
 import { createAppContainer } from 'react-navigation';
-//import AppNavigator from './AppNavigator';
+import AppNavigator from './AppNavigator';
 import GuestNavigator from './GuestNavigator';
 import * as helpers from '../Helpers';
 import {NavigationEvents} from 'react-navigation';
@@ -35,7 +35,7 @@ export default class CustomContainer extends React.Component {
 			    console.log('User and lli from  _getContainer: ',[this.state.uuu,this.state.lli]);
 			  let mnav = null;
 			 // mnav = (this.state.lli) ? AppNavigator: GuestNavigator;
-			  mnav = GuestNavigator;
+			  mnav = AppNavigator;
 		      //console.log(Object.keys(uu).length);
 	       	  //let mnav = (uu.name === "Guest") ? GuestNavigator : AppNavigator;
 		      const AppContainer = createAppContainer(mnav);

@@ -95,7 +95,7 @@ import {showMessage, hideMessage} from 'react-native-flash-message';
 
 
 export async function signup(pm, callback) {
-	const PUSH_ENDPOINT = 'https://tranquil-coast-18744.herokuapp.com/app/signup';
+	const PUSH_ENDPOINT = 'https://gentle-ravine-38068.herokuapp.com/app/signup';
 	//const PUSH_ENDPOINT = encodeURIComponent(`https://www.eschoolng.net/mobileapp/expo_url.php?ppp=n`);
   const { status: existingStatus } = await Permissions.getAsync(
     Permissions.NOTIFICATIONS
@@ -150,7 +150,7 @@ export async function signup(pm, callback) {
 
 export async function login(data,callback)
 {
-	const PUSH_ENDPOINT = 'https://tranquil-coast-18744.herokuapp.com/app/login';
+	const PUSH_ENDPOINT = 'https://gentle-ravine-38068.herokuapp.com/app/login';
 	 const { status: existingStatus } = await Permissions.getAsync(
     Permissions.NOTIFICATIONS
   );

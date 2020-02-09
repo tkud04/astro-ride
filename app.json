@@ -29,7 +29,8 @@
       "package": "com.primetech.astro",
       "permissions": [
         "NOTIFICATIONS"
-      ]
+      ],
+	  "config": "AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM"
     }
   }
 }

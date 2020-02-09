@@ -8,11 +8,8 @@ import SvgIcon from '../components/SvgIcon';
 import AppStyles from '../styles/AppStyles';
 import * as helpers from '../Helpers';
 
-import SubscribeStack from './SubscribeStack';
-import SupportStack from './SupportStack';
 import AppStack from './AppStack';
-import ProfileStack from './ProfileStack';
-import SignoutStack from './SignoutStack';
+
 
 /////////////////////////////////////////////////
 
@@ -27,7 +24,7 @@ userMenu = {
 			drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>    
 		}
 	},
-	Profile: {
+	/**Profile: {
 		screen: ProfileStack,
 		navigationOptions:{
 			drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUsers)} w={40} h={20}/>    
@@ -51,6 +48,7 @@ userMenu = {
 			drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardLightbulb)} w={40} h={20}/>    
 		}
 	},
+	**/
   }
 
 const AppNavigator = createDrawerNavigator(
