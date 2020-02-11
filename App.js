@@ -12,9 +12,12 @@ import CustomContainerComponent from './navigation/CustomContainerComponent';
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system';
 import { Notifications } from 'expo';
+import * as TaskManager from 'expo-task-manager';
 import FlashMessage from 'react-native-flash-message';
 import {ThemeContext,UserContext} from './MyContexts.js';
 
+
+const LOCATION_TASK_NAME = 'background-location-task';
 
 export default class App extends React.Component {
 constructor(props){
@@ -124,6 +127,21 @@ resolve = async (pr) => {
     this.setState({ isLoadingComplete: true });
   };
 }
+
+/**
+TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+  if (error) {
+    // Error occurred - check `error.message` for more details.
+	console.log("Error: ",error.message);
+    return;
+  }
+  if (data) {
+    const { locations } = data;
+    // do something with the locations captured in the background
+	console.log("Locations: ",locations);
+  }
+});
+**/
 
 const styles = StyleSheet.create({
   container: {

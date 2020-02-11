@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import AppStyles from '../styles/AppStyles';
 import SvgIcon from './SvgIcon';
 import * as helpers from '../Helpers';
+import NavigationService from '../navigation/NavigationService.js';
 import { DrawerItems } from 'react-navigation-drawer';
 import {ThemeContext,UserContext} from '../MyContexts';
 
@@ -11,15 +12,19 @@ import {ThemeContext,UserContext} from '../MyContexts';
 
 let uu = {};
 
-_getUsername = (u) =>{
+_getName = (u) =>{
 	let r = "Guest";
-	if(u.name) r = u.name;
+	if(u.fname && u.lname) r = `${u.fname} ${u.lname}`;
 	return r;
 }
 _getEmail = (u) =>{
 	let r = "Sign in";
 	if(u.email) r = u.email; 
 	return r;
+}
+
+_goToProfile = (u) =>{
+	NavigationService.navigate('Profile', { user: u });
 }
 const ripple = TouchableNativeFeedback.Ripple('#adacac', false);
 const CustomDrawerComponent = props => (
@@ -45,15 +50,17 @@ const CustomDrawerComponent = props => (
 		 });
 				   return (
 		     <View>
-			 
+			
+			<ProfileButton
+			  onPress={() => {_goToProfile(user)}}
+			 >
             <View style={{ backgroundColor: AppStyles.headerBackground }}>
-              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{flexDirection: 'row', marginLeft: 10, marginVertical: 10}}>
 			    <Logo source={require('../assets/images/bg.jpg')}/>
-				<Username style={{ color: '#f9f9f9', marginTop: '3%', fontFamily: 'sans-serif-condensed' }}>{`Hi ${_getUsername(user)}`}</Username>
-                <Email style={{ color: '#f9f9f9', fontFamily: 'sans-serif-condensed' }}>{`${_getEmail(user)}`}</Email>
+				<Username style={{ color: '#f9f9f9', marginTop: '20%', marginLeft: '5%', fontFamily: 'sans-serif-condensed' }}>{`${_getName(user)}`}</Username>
               </View>
             </View>
-			
+			</ProfileButton>
 			 <View>
 			    <DrawerItems {...props} />
 			 </View>  
@@ -71,14 +78,7 @@ const CustomDrawerComponent = props => (
           <TouchableNativeFeedback background={ripple}>
             <FooterItem>
               <SvgIcon xml={AppStyles.svg.cardUsers} w="10%" h="10%"/>
-              <FooterItemText style={{ fontFamily: 'sans-serif-medium' }}>FAQ</FooterItemText>
-            </FooterItem>
-          </TouchableNativeFeedback>
-
-          <TouchableNativeFeedback background={ripple}>
-            <FooterItem style={{marginBottom: 5}}>
-              <SvgIcon xml={AppStyles.svg.cardLightbulb} w="10%" h="10%"/>
-              <FooterItemText style={{ fontFamily: 'sans-serif-medium' }}>Developer</FooterItemText>
+              <FooterItemText style={{ fontFamily: 'sans-serif-medium' }}>Support</FooterItemText>
             </FooterItem>
           </TouchableNativeFeedback>
         </View>
@@ -90,7 +90,7 @@ export default CustomDrawerComponent;
 
 
 const Username = styled.Text`
-
+font-size: 20;
 `;
 
 const Email = styled.Text`
@@ -125,9 +125,13 @@ const SvgView = styled.View`
 `;
 
 const Logo = styled.Image`
-           width: 110px;
-		   height: 110px;
+           width: 80px;
+		   height: 80px;
 		   background: black;
-		   border-radius: 55px;
+		   border-radius: 44px;
 		   margin-top: 25px;
+`;
+
+const ProfileButton = styled.TouchableOpacity`
+
 `;

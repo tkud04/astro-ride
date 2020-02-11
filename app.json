@@ -30,7 +30,24 @@
       "permissions": [
         "NOTIFICATIONS"
       ],
-	  "config": "AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM"
+	  "config": {
+         "googleMaps": {
+           "apiKey": "AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM"
+        }  
+	  }
+	  
+    },
+	"ios": {
+	  "bundleIdentifier": "com.primetech.astro",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ]
+      },
+	  "config": {
+         "googleMapsApiKey": "AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM" 
+	  }
     }
   }
 }

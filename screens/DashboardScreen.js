@@ -4,17 +4,18 @@ import CButton from '../components/CButton';
 import AppHomeHeader from '../components/AppHomeHeader';
 import AppStyles from '../styles/AppStyles';
 import * as helpers from '../Helpers';
-import MapView from 'react-native-maps';
+import MapView,{Marker} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import TitleHeader from '../components/TitleHeader';
 import * as Permissions from 'expo-permissions';
-//import * as SMS from 'expo-sms';
+import * as Location from 'expo-location';
 import {ScrollView, Dimensions} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 import { Notifications } from 'expo';
 
 //var RNFS = require('react-native-fs');
+const LOCATION_TASK_NAME = 'background-location-task';
 
 export default class DashboardScreen extends React.Component { 
    constructor(props) {
@@ -22,21 +23,18 @@ export default class DashboardScreen extends React.Component {
 	this.props.navigation.setParams({launchDrawer: this.launchDrawer});	
 	//this.dt = props.navigation.state.params.dt;
 	
-    this.state = { fnameBorderBottomColor: '#000',
-	               lnameBorderBottomColor: '#000',				  
-	               genderBorderBottomColor: '#000',				  
-				   loading: false,
-				   fname: "",			 
-				   lname: "",			 
-				   gender: "none",
-                   genderTypes: [
-				         {key: 1,name: "Male", value: "male"},
-	                     {key: 3,name: "Female", value: "female"},
-	                    ]				   
+	
+    this.state = { 
+                   	 mapRegion: null,
+                     hasLocationPermissions: false,
+                     locationResult: null,
+                     markerCoords: {latitude: 0,longitude: 0},
 				 };	
 				 
 	this.navv = null;
     
+	
+	this._getLocationAsync();
   }
   
     launchDrawer = () => {
@@ -60,7 +58,49 @@ export default class DashboardScreen extends React.Component {
     };
 	  
   
+  _test = async () => {
+	  const { status } = await Location.requestPermissionsAsync();
+    if (status === 'granted') {
+      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        accuracy: Location.Accuracy.Balanced,
+      });
+    }
+  }
+
+  _getLocationAsync = async () => {
+	  const { status } = await Location.requestPermissionsAsync();
+    if (status === 'granted') {
+      this.setState({ hasLocationPermissions: true });
+
+      let location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.Highest});
+      this.setState({ locationResult: JSON.stringify(location) });
+      this.setState({ markerCoords: {
+		     latitude: location.coords.latitude,
+		     longitude: location.coords.longitude
+		    }
+			});
+	  
+      // Center the map on the location we just fetched.
+      this.setState({
+        mapRegion: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        },
+      });
+    }
+	else{
+		showMessage({
+			 message: "Locations permissions not granted",
+			 type: 'warning'
+		 });
+	}
+  }
   
+  _handleMapRegionChange = mapRegion => {
+    //this.setState({ mapRegion });
+  };
   
   _continue = () => {
 	 //form validation
@@ -105,20 +145,38 @@ export default class DashboardScreen extends React.Component {
   render() {
 	 let navv = this.props.navigation;
 	  this.navv = navv;
+	  if(this.state.mapRegion !== null){
+			console.log("current coords: ",this.state.markerCoords);
+		  
+	  }
     return (
 	       <BackgroundImage source={require('../assets/images/bg.jpg')}>
 	        <Container>	     
 
 				   <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
-				     <MapView style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height}} />
+				     <MapView 
+					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 150}}
+					   region={this.state.mapRegion}
+                       onRegionChange={this._handleMapRegionChange}
+   				     >
+				       <Marker
+					      coordinate={this.state.markerCoords}
+						  title="Sample MArker Title"
+                          description="This is a sample marker description"
+					   />
+					 </MapView>
 				   </Row>
-				  
+				   <Row>
+				    <TestView>
+					  <TestText></TestText>
+					</TestView>
+				   </Row>
 				   <Row style={{flex: 1,justifyContent: 'flex-end', width: '90%'}}>
 				   <SubmitButton
-				       onPress={() => {this._continue()}}
+				       onPress={() => {this._test()}}
 				       title="Submit"
                     >
-                        <CButton title="Continue" background="rgb(101, 33, 33)" color="#fff" />					   
+                        <CButton title="Test" background="rgb(101, 33, 33)" color="#fff" />					   
 				    </SubmitButton>	
                     </Row>					
 			</Container>
@@ -127,6 +185,8 @@ export default class DashboardScreen extends React.Component {
   }
   
 }
+
+
 
 const BackgroundImage = styled.ImageBackground`
            width: 100%;
@@ -230,4 +290,15 @@ const BottomInputs = styled.View`
 
 const NoteView = styled.View`
 
+`;
+
+const TestView = styled.View`
+
+`;
+
+const TestText = styled.Text` 
+                   color: rgb(101, 33, 33);
+				   margin-bottom: 6px;
+				   font-size: 16px;
+				   padding: 8px;
 `;

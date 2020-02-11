@@ -24,12 +24,14 @@ userMenu = {
 			drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>    
 		}
 	},
-	/**Profile: {
+	/**
+	Profile: {
 		screen: ProfileStack,
 		navigationOptions:{
 			drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUsers)} w={40} h={20}/>    
 		}
 	},
+	
 	Subscribe: {
 		screen: SubscribeStack,
 		navigationOptions:{
