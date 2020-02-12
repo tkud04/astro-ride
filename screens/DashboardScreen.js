@@ -58,13 +58,17 @@ export default class DashboardScreen extends React.Component {
     };
 	  
   
-  _test = async () => {
+  _testt = async () => {
 	  const { status } = await Location.requestPermissionsAsync();
     if (status === 'granted') {
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.Balanced,
       });
     }
+  }
+  
+  _test = () => {
+	  this.navv.navigate('DisplayLatLng'); 
   }
 
   _getLocationAsync = async () => {

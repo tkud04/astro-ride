@@ -5,6 +5,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 
 import DashboardScreen from '../screens/DashboardScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import DisplayLatLng from '../screens/DisplayLatLng';
 
 /////////////////////////////////////////////////
 
@@ -16,6 +17,10 @@ const ret = createStackNavigator(
 	},
 	Profile: {
 		screen: ProfileScreen,
+		headerLeft: null,
+	},
+	DisplayLatLng: {
+		screen: DisplayLatLng,
 		headerLeft: null,
 	},
 	
