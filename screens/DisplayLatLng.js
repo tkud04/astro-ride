@@ -42,21 +42,6 @@ class DisplayLatLng extends React.Component {
   }
   
   
-    static navigationOptions = ({navigation}) => {
-	   return {
-	   headerStyle: {
-		   backgroundColor: AppStyles.headerBackground,
-		   height: AppStyles.headerHeight
-	   },
-	  headerTitle: () => <AppHomeHeader xml={AppStyles.svg.chartBar} navv = {navigation} title="AstroRide" subtitle="DisplayLatLng"/>,
-	   headerTintColor: AppStyles.headerColor,
-	   headerTitleStyle: {
-		   
-       },
-	   headerLeft: null,
-	   }
-   
-    };
 	  
    
     _getLocationAsync = async () => {

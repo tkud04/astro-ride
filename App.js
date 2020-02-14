@@ -8,7 +8,13 @@ import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import * as helpers from './Helpers';
-import CustomContainerComponent from './navigation/CustomContainerComponent';
+import { NavigationContainer } from '@react-navigation/native';
+import AppStyles from './styles/AppStyles';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import CustomDrawerComponent from './components/CustomDrawerComponent';
+import AppStack from './navigation/AppStack';
+import AuthStack from './navigation/AuthStack';
+import SvgIcon from './components/SvgIcon';
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system';
 import { Notifications } from 'expo';
@@ -18,6 +24,7 @@ import {ThemeContext,UserContext} from './MyContexts.js';
 
 
 const LOCATION_TASK_NAME = 'background-location-task';
+const Drawer = createDrawerNavigator();
 
 export default class App extends React.Component {
 constructor(props){
@@ -27,24 +34,17 @@ constructor(props){
 	
 	this.state = {
     isLoadingComplete: false,
+    isLoggedIn: false,
     isRealLoadingComplete: false,
 	user:  {},
 	ttk: null,
 	up: this._updateUser,
 	loggedIn: false
- 	
   };
   
 	
   //this.resolve(this.hu);
 }
-
-resolve = async (pr) => {
-	let rr = await pr;
-	console.log("rr",rr);
-	this._updateUser(rr);
-}
-
   
   _notificationSubscription = null;
   
@@ -56,11 +56,12 @@ resolve = async (pr) => {
     this.setState({notification: notification});
   };
   
-  _updateUser = (ret) => {
-    this.state.user = ret[0];
-    this.state.ttk = ret[0].tk;
+  _updateUser = (u) => {
+	  console.log("ret: ",u);
+    this.state.user = u[0];
+    this.state.ttk = u[0].tk;
 	this.state.loggedIn = (this.state.ttk !== null);
-	console.log("user context updated with ",[ret,this.state.loggedIn]);
+	console.log("user context updated with ",[this.state.isLoggedIn]);
   };
 
   render() {
@@ -79,17 +80,26 @@ resolve = async (pr) => {
 		  helpers.getLoggedInUser().then((dt) => {
 			  this.state.user = dt;					  
 			  this.state.isRealLoadingComplete = true;
+			  this.state.isLoggedIn = true;
 			  console.log("uu",this.state.user);
-			  this.state.up([this.state.user]);
-			  
+			  this.state.up([this.state.user]);	   
 			 
 		 });
 		  return (
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
 		  <ThemeContext.Provider>
-		     <UserContext.Provider value={this.state}>
-		       <CustomContainerComponent />
+		     <UserContext.Provider value={this.state}>			
+		       <NavigationContainer>
+			    <Drawer.Navigator  initialRouteName='Dashboard' drawerContent={props => (<CustomDrawerComponent {...props}/>)}>
+				   {this.state.isLoggedIn ? (
+				    <Drawer.Screen name="Dashboard" component={AppStack} options={{drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/> }}/>
+				   ) : (
+				    <Drawer.Screen name="Sign in" component={AuthStack} options={{drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/> }}/>
+				   )}
+           
+                </Drawer.Navigator>
+			   </NavigationContainer>
 		     </UserContext.Provider>
 		  </ThemeContext.Provider>
           <FlashMessage position="bottom" />

@@ -7,14 +7,15 @@ import * as helpers from '../Helpers';
 
 
 const AppInputImageHeader = props => {
+	console.log("r: ",props.r);
 return (
 <Container>
-<BackgroundImage source={require('../assets/images/header.png')}>
+<BackgroundImage source={require('../assets/images/header.jpg')}>
 </BackgroundImage>
 <OverlayView pointerEvents="none"></OverlayView>
 <HeaderView>
   <ButtonsView>
-  <MenuButton onPress={props.navv.getParam(props.leftParam)} style={{marginLeft: 15}}>
+  <MenuButton onPress={props.r.params.goBack} style={{marginLeft: 15}}>
 		  <HeaderMenuButton xml={AppStyles.svg.headerBack} w={30} h={30} ss={{marginLeft: 10, alignSelf: 'flex-start'}}/>
 		</MenuButton>
 	<SvgView>

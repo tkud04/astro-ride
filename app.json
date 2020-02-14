@@ -28,7 +28,9 @@
     "android": {
       "package": "com.primetech.astro",
       "permissions": [
-        "NOTIFICATIONS"
+        "NOTIFICATIONS",
+		"ACCESS_COARSE_LOCATION",
+		"ACCESS_FINE_LOCATION"
       ],
 	  "config": {
          "googleMaps": {

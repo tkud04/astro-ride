@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { createBottomTabNavigator } from 'react-navigation';
-import { createDrawerNavigator } from 'react-navigation-drawer';
+
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import CustomDrawerComponent from '../components/CustomDrawerComponent';
 import SvgIcon from '../components/SvgIcon';
@@ -53,18 +53,26 @@ userMenu = {
 	**/
   }
 
-const AppNavigator = createDrawerNavigator(
+const Drawer = createDrawerNavigator();
+
+/**
   userMenu,
   {
 	  initialRouteName: 'Dashboard',
-	  contentComponent: (props) => (<CustomDrawerComponent {...props}/>),
+	  contentComponent: ,
 	  /**contentOptions:{
 		items: () =>  
 	  },**/
-	  drawerOpenRoute: 'DrawerOpen',
+/**	  drawerOpenRoute: 'DrawerOpen',
 	  drawerCloseRoute: 'DrawerClose',
 	  drawerToggleRoute: 'DrawerToggle',
   }
+**/
+
+let AppNavigator = () => (
+<Drawer.Navigator  initialRouteName: 'Dashboard' drawerContent={props => (<CustomDrawerComponent {...props}/>)}>
+<Drawer.Screen name="Dashboard" component={AppStack} options={{drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/> }}/>
+</Drawer.Navigator>
 );
 
 export default AppNavigator;

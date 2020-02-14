@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import CButton from '../components/CButton';
-import AppHomeHeader from '../components/AppHomeHeader';
 import AppStyles from '../styles/AppStyles';
 import * as helpers from '../Helpers';
 import MapView,{Marker} from 'react-native-maps';
@@ -40,22 +39,6 @@ export default class DashboardScreen extends React.Component {
     launchDrawer = () => {
 	this.navv.toggleDrawer();  
   }
-
-  static navigationOptions = ({navigation}) => {
-	   return {
-	   headerStyle: {
-		   backgroundColor: AppStyles.headerBackground,
-		   height: AppStyles.headerHeight
-	   },
-	  headerTitle: () => <AppHomeHeader xml={AppStyles.svg.chartBar} navv = {navigation} title="AstroRide" subtitle="Dashboard"/>,
-	   headerTintColor: AppStyles.headerColor,
-	   headerTitleStyle: {
-		   
-       },
-	   headerLeft: null,
-	   }
-   
-    };
 	  
   
   _testt = async () => {

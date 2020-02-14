@@ -9,12 +9,12 @@ import * as helpers from '../Helpers';
 const AppHomeHeader = props => {
 return (
 <Container>
-<BackgroundImage source={require('../assets/images/header.png')}>
+<BackgroundImage source={require('../assets/images/header.jpg')}>
 </BackgroundImage>
 <OverlayView pointerEvents="none"></OverlayView>
 <HeaderView>
   <ButtonsView>
-  <MenuButton onPress={props.navv.getParam('launchDrawer')}>
+  <MenuButton onPress={props.r.params.launchDrawer}>
 		  <HeaderMenuButton xml={AppStyles.svg.headerHamburger} w={30} h={30} ss={{marginLeft: 10, alignSelf: 'flex-start'}}/>
 		</MenuButton>
 	<SvgView>

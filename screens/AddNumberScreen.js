@@ -18,7 +18,7 @@ import { Notifications } from 'expo';
 export default class AddNumberScreen extends React.Component { 
    constructor(props) {
     super(props);
-	this.props.navigation.setParams({goBack: () => {this.props.navigation.goBack()}});
+	//this.props.navigation.setParams({goBack: () => {this.props.navigation.goBack()}});
 	
     this.state = { phoneBorderBottomColor: '#000',				  
 				   loading: false,
@@ -28,22 +28,6 @@ export default class AddNumberScreen extends React.Component {
 	this.navv = null;
     
   }
-
-  static navigationOptions = ({navigation}) => {
-	   return {
-	   headerStyle: {
-		   backgroundColor: AppStyles.headerBackground,
-		   height: AppStyles.headerHeight
-	   },
-	   headerTitle: () => <AppInputImageHeader xml={AppStyles.svg.headerPhone}  leftParam = "goBack" navv = {navigation} title="Sign up" subtitle="Enter phone number"  sml={30}/>,
-	   headerTintColor: AppStyles.headerColor,
-	   headerTitleStyle: {
-		   
-       },
-	   headerLeft: null,
-	   }
-   
-    };
 	  
   
   

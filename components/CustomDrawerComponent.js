@@ -5,7 +5,10 @@ import AppStyles from '../styles/AppStyles';
 import SvgIcon from './SvgIcon';
 import * as helpers from '../Helpers';
 import NavigationService from '../navigation/NavigationService.js';
-import { DrawerItems } from 'react-navigation-drawer';
+import {
+  DrawerContentScrollView,
+  DrawerItemList,
+} from '@react-navigation/drawer';
 import {ThemeContext,UserContext} from '../MyContexts';
 
 
@@ -40,13 +43,8 @@ const CustomDrawerComponent = props => (
              {theme => (
                <UserContext.Consumer>
 			   {({user,up,loggedIn}) => {
-				   //console.log("user in cdc: ",user);
-				   //console.log("cdc items: ",props.items);
 				   helpers.getLoggedInUser().then((dt) => {
-			  //uu = dt;
-			  //console.log("updating context from cdc async");
-			  //up([uu,loggedIn]);
-			  //console.log('User inside cdc async function',uu);
+					   
 		 });
 				   return (
 		     <View>
@@ -62,7 +60,9 @@ const CustomDrawerComponent = props => (
             </View>
 			</ProfileButton>
 			 <View>
-			    <DrawerItems {...props} />
+			    <DrawerContentScrollView {...props}>
+				  <DrawerItemList {...props}/>
+			    </DrawerContentScrollView>
 			 </View>  
 			 
 			</View>
