@@ -18,7 +18,7 @@ export default class VerifyNumberScreen extends React.Component {
    constructor(props) {
     super(props);
 	this.props.navigation.setParams({goBack: () => {this.props.navigation.goBack()}});
-	this.dt = props.navigation.state.params.dt;
+	this.dt = props.route.params.dt;
 	
     this.state = { codeOneBorderBottomColor: '#000',
                 	codeTwoBorderBottomColor: '#000',				  
@@ -35,22 +35,6 @@ export default class VerifyNumberScreen extends React.Component {
 	this.navv = null;
     
   }
-
-  static navigationOptions = ({navigation}) => {
-	   return {
-	   headerStyle: {
-		   backgroundColor: AppStyles.headerBackground,
-		   height: AppStyles.headerHeight
-	   },
-	   headerTitle: () => <AppInputImageHeader xml={AppStyles.svg.headerPhone}  leftParam = "goBack" navv = {navigation} title="Sign up" subtitle="Verify phone number"  sml={30}/>,
-	   headerTintColor: AppStyles.headerColor,
-	   headerTitleStyle: {
-		   
-       },
-	   headerLeft: null,
-	   }
-   
-    };
 	  
   
   
@@ -79,16 +63,38 @@ export default class VerifyNumberScreen extends React.Component {
 		
 	 console.log("dt: ",this.dt);
 
-	if(this.dt.code != this.dt.codeConfirm){
+	if(`${this.dt.code}` !== this.dt.codeConfirm){
 		showMessage({
 			 message: `The code is invalid.`,
 			 type: 'danger'
 		 });
 	}
 	else{
-	  this.navv.navigate('AddName',{
-		dt: this.dt
-	  });	
+	  showMessage({
+			 message: `Verifying`,
+			 type: 'info'
+		 });
+		  helpers.checkIfUserExists(this.dt.to,(res) => {
+			  console.log("res: ",res);
+			  if(res.status === "ok"){
+			     if(res.exists){
+				     this.navv.navigate('UserLogin',{
+		               dt: this.dt
+	                 });
+			     }
+			     else{
+				     this.navv.navigate('AddName',{
+		               dt: this.dt
+	                 });
+			     }
+			  }
+			  else{
+				  showMessage({
+			 message: `Network error, please try again.`,
+			 type: 'danger'
+		 });
+			  }
+		  });	
 	}
 	
 	}

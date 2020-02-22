@@ -1,67 +1,64 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import AppStyles from '../styles/AppStyles';
-import AppHomeHeader from '../components/AppHomeHeader';
 import AppInputImageHeader from '../components/AppInputImageHeader';
+import AppHomeHeader from '../components/AppHomeHeader';
+import AppStyles from '../styles/AppStyles';
 import DashboardScreen from '../screens/DashboardScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import TripsScreen from '../screens/TripsScreen';
+import PaymentScreen from '../screens/PaymentScreen';
 import DisplayLatLng from '../screens/DisplayLatLng';
 
 /////////////////////////////////////////////////
 
 const Stack = createStackNavigator();
 
-/**
-  {
-	Dashboard: {
-		screen: DashboardScreen,
-		headerLeft: null,
-	},
-	Profile: {
-		screen: ProfileScreen,
-		headerLeft: null,
-	},
-	DisplayLatLng: {
-		screen: DisplayLatLng,
-		headerLeft: null,
-	},
-	
-  },
-);
-
-**/
 
 let AppStack = () => (
 <Stack.Navigator>
-                 <Stack.Screen
+				<Stack.Screen
                   name="Dashboard"
 	              component={DashboardScreen}
-				  options={{
-				    headerStyle: {
-		            backgroundColor: AppStyles.headerBackground,
-		            height: AppStyles.headerHeight
-	              },
-	             headerTitle: () => <AppHomeHeader xml={AppStyles.svg.chartBar} navv = {navigation} title="AstroRide" subtitle="Dashboard"/>,
-	             headerTintColor: AppStyles.headerColor,
-	             headerLeft: null
-				  }}
-	              
-                />
-				<Stack.Screen
-                  name="DisplayLatLng"
-	              component={DisplayLatLng}
-				  options={{
+				  options={({route}) => ({
 					headerStyle: {
 		            backgroundColor: AppStyles.headerBackground,
 		            height: AppStyles.headerHeight
 	              },
-	             headerTitle: () => <AppHomeHeader xml={AppStyles.svg.chartBar} navv = {navigation} title="AstroRide" subtitle="DisplayLatLng"/>,
+	             header: () => <AppHomeHeader xml={AppStyles.svg.chartBar}  r = {route} title="AstroRide" subtitle="Dashboard"  sml={100}/>,
 	             headerTintColor: AppStyles.headerColor,
 	             headerLeft: null  
-				  }}
+				  })}
 	              
                 />
+                  <Stack.Screen
+                  name="Trips"
+	              component={TripsScreen}
+				  options={({route}) => ({
+					headerStyle: {
+		            backgroundColor: AppStyles.headerBackground,
+		            height: AppStyles.headerHeight
+	              },
+	             header: () => <AppHomeHeader xml={AppStyles.svg.chartBar}  r = {route} title="AstroRide" subtitle="Trips"  sml={40}/>,
+	             headerTintColor: AppStyles.headerColor,
+	             headerLeft: null  
+				  })}
+	              
+                /> 		
+				<Stack.Screen
+                  name="Payment"
+	              component={PaymentScreen}
+				  options={({route}) => ({
+					headerStyle: {
+		            backgroundColor: AppStyles.headerBackground,
+		            height: AppStyles.headerHeight
+	              },
+	             header: () => <AppHomeHeader xml={AppStyles.svg.chartBar}  r = {route} title="AstroRide" subtitle="Payment"  sml={40}/>,
+	             headerTintColor: AppStyles.headerColor,
+	             headerLeft: null  
+				  })}
+	              
+                /> 				
 				
                 </Stack.Navigator>
 );

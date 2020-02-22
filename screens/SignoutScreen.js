@@ -7,7 +7,7 @@ import * as helpers from '../Helpers';
 import * as FileSystem from 'expo-file-system';
 import TitleHeader from '../components/TitleHeader';
 import * as Permissions from 'expo-permissions';
-//import * as SMS from 'expo-sms';
+import {ThemeContext,UserContext} from '../MyContexts';
 import {ScrollView} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
@@ -15,7 +15,7 @@ import { Notifications } from 'expo';
 
 //var RNFS = require('react-native-fs');
 
-export default class AddNumberScreen extends React.Component { 
+export default class SignoutScreen extends React.Component { 
    constructor(props) {
     super(props);
 	//this.props.navigation.setParams({goBack: () => {this.props.navigation.goBack()}});
@@ -32,34 +32,36 @@ export default class AddNumberScreen extends React.Component {
   
   
   
-  _continue = () => {
-	 //form validation
-	  
-  let validationErrors = (this.state.phone.length < 10);
-	  if(validationErrors){
+ _signout = (uu,upp) => {
+
+		this.state.loading = true;
 	 
-	 if(this.state.phone.length < 10){
-		 showMessage({
-			 message: "A valid phone number is required",
-			 type: 'danger'
+	 //console.log(dt);
+	 
+	 showMessage({
+			 message: "Signing you out..",
+			 type: 'info'
 		 });
-	 }
-	 
-	}
-	
-	else{
-		let formattedNumber = helpers.formatPhoneNumber(this.state.phone);
+		 
+		upp([{},""]);
 		
-		
-	  
-	  const dt = {
-		    to: formattedNumber,
-		    id: helpers.getUniqueID('user'),
-			code: helpers.getCode()
-	 };  
-	 
-     helpers.sendSMSAsync(dt, this.navv);
-	}
+     //Log user in
+	 /**
+		        helpers.logout((res) => {
+					
+					if(res.status == "ok"){						
+                       upp([{},""]);
+                        						
+					}
+					else{
+						showMessage({
+			              message: `Username or password incorrect, please try again.`,
+			              type: 'danger'
+		                });
+					}
+					this.state.loading = false;
+				});	
+	**/
 	 
   }
   
@@ -68,41 +70,26 @@ export default class AddNumberScreen extends React.Component {
 	  this.navv = navv;
     return (
 	        <Container>	     
-
-				   <Row style={{flex: 1, marginTop: 5, width: '100%'}}>
-				     <ProductInputWrapper style={{flexDirection: 'row',width: '100%'}}>
-					 <ProductDescription style={{width: '20%'}}>+234</ProductDescription>
-				    <ProductInput
-					style={{borderColor: this.state.phoneBorderBottomColor,width: '70%'}}
-				     placeholder="0801 234 5678"
-					  value={this.state.phone}
-				     onChangeText={text => {
-						this.setState({phone: text});
-					 }}
-					 onFocus={() => {
-						 
-						this.setState({phoneBorderBottomColor: "#00a2e8"});
-					 }}
-					 onBlur={() => {
-						
-						this.setState({phoneBorderBottomColor: "#000"});
-					 }}
-					 keyboardType="decimal-pad"
-					/>
-					</ProductInputWrapper>
-				   </Row>
-				  
-				   <Row style={{flex: 1,justifyContent: 'flex-end', width: '90%'}}>
-				   <NoteView style={{ alignItems: 'center', justifyContent: 'center'}}>
-				   <TitleHeader bc="rgb(101, 23, 33)" tc="rgb(101, 33, 33)" title="By continuing you may receive a verification SMS. Message and data rates may apply"/>
-                   </NoteView>
+ <ScrollView>		     
+				   <Row style={{justifyContent: 'center',alignItems: 'center',flexDirection: 'column',marginTop: 20}}>			   
+				   <Logo source={require('../assets/images/bg.jpg')}/>	
+                    <TitleHeader bc="red" tc="red" title="NOTE: Make sure you sync your data with our servers so as to avoid permanent loss of your data when you sign out."/>									   
+                   </Row>
+                  
+				  <Row style={{flex: 1,justifyContent: 'flex-end', width: '90%'}}>
+				  <UserContext.Consumer>
+					  {({user,up}) => (
 				   <SubmitButton
-				       onPress={() => {this._continue()}}
+				       onPress={() => {this._signout(user, up)}}
 				       title="Submit"
                     >
-                        <CButton title="Continue" background="rgb(101, 33, 33)" color="#fff" />					   
+                        <CButton style={{width: '100%'}} title="Sign out" background="rgb(101, 33, 33)" color="#fff" />					   
 				    </SubmitButton>	
-                    </Row>					
+					)}
+					   </UserContext.Consumer>	
+                    </Row>		
+					
+			  </ScrollView>
 			</Container>
     );
   }
@@ -117,6 +104,7 @@ const BackgroundImage = styled.ImageBackground`
 
 const Container = styled.View`
 					 background-color: #fff;
+					 margin-top: ${AppStyles.headerHeight - 34}px;
 					flex: 1;
 `;
 

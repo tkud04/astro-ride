@@ -13,8 +13,12 @@ import AppStyles from './styles/AppStyles';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomDrawerComponent from './components/CustomDrawerComponent';
 import AppStack from './navigation/AppStack';
+import TripsStack from './navigation/TripsStack';
+import PaymentStack from './navigation/PaymentStack';
 import AuthStack from './navigation/AuthStack';
+import AppHomeHeader from './components/AppHomeHeader';
 import SvgIcon from './components/SvgIcon';
+import SignoutScreen from './screens/SignoutScreen';
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system';
 import { Notifications } from 'expo';
@@ -26,6 +30,17 @@ import {ThemeContext,UserContext} from './MyContexts.js';
 const LOCATION_TASK_NAME = 'background-location-task';
 const Drawer = createDrawerNavigator();
 
+const GUEST = {
+	email: "",
+    fname: "Welcome,",
+    gender: "",
+    id: "guest",
+    lname: "Guest",
+    password: "",
+    to: "",
+	tk: null
+};
+
 export default class App extends React.Component {
 constructor(props){
 	super(props);
@@ -36,11 +51,20 @@ constructor(props){
     isLoadingComplete: false,
     isLoggedIn: false,
     isRealLoadingComplete: false,
-	user:  {},
+	user:  GUEST,
 	ttk: null,
 	up: this._updateUser,
 	loggedIn: false
   };
+  
+   helpers.getLoggedInUser().then((dt) => {
+			  this.state.user = (Object.keys(dt).length === 0) ? GUEST : dt;					  
+			  this.state.isRealLoadingComplete = true;
+			  this.state.isLoggedIn = true;
+			  console.log("uu",this.state.user);
+			  this.state.up([this.state.user]);	   
+			 
+		 });
   
 	
   //this.resolve(this.hu);
@@ -57,11 +81,11 @@ constructor(props){
   };
   
   _updateUser = (u) => {
-	  console.log("ret: ",u);
-    this.state.user = u[0];
-    this.state.ttk = u[0].tk;
-	this.state.loggedIn = (this.state.ttk !== null);
-	console.log("user context updated with ",[this.state.isLoggedIn]);
+    let uuser = (Object.keys(u[0]).length === 0) ? GUEST : u[0];
+    let tttk  = (u[1] === "test") ? "testTTK" : uuser.tk;
+	let lloggedIn = (tttk !== null);
+	this.setState({user: uuser,tk: tttk,loggedIn: lloggedIn});
+	console.log("user context updated with ",[uuser,lloggedIn]);
   };
 
   render() {
@@ -77,25 +101,23 @@ constructor(props){
     } else {
 		//helpers.getLoggedInUser((u) => {this._updateUser(u)});
 		
-		  helpers.getLoggedInUser().then((dt) => {
-			  this.state.user = dt;					  
-			  this.state.isRealLoadingComplete = true;
-			  this.state.isLoggedIn = true;
-			  console.log("uu",this.state.user);
-			  this.state.up([this.state.user]);	   
-			 
-		 });
+		 
 		  return (
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
 		  <ThemeContext.Provider>
 		     <UserContext.Provider value={this.state}>			
 		       <NavigationContainer>
-			    <Drawer.Navigator  initialRouteName='Dashboard' drawerContent={props => (<CustomDrawerComponent {...props}/>)}>
-				   {this.state.isLoggedIn ? (
-				    <Drawer.Screen name="Dashboard" component={AppStack} options={{drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/> }}/>
+			    <Drawer.Navigator initialRouteName='Dashboard' drawerContent={props => (<CustomDrawerComponent {...props}/>)}>
+				   {this.state.loggedIn ? (
+				   <>
+				    <Drawer.Screen name="Dashboard" component={AppStack} options={{drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>) }}/>
+				    <Drawer.Screen name="Trips" component={TripsStack} options={{drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>) }}/>
+				    <Drawer.Screen name="Payment" component={PaymentStack} options={{drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>) }}/>
+				    <Drawer.Screen name="Sign out" component={SignoutScreen} options={({route}) => ({drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>), headerStyle: {backgroundColor: AppStyles.headerBackground, height: AppStyles.headerHeight}, header: () => <AppHomeHeader xml={AppStyles.svg.chartBar} r = {route} title="AstroRide" subtitle="Dashboard"  sml={40}/>, headerTintColor: AppStyles.headerColor, headerLeft: null})}/>
+					</>
 				   ) : (
-				    <Drawer.Screen name="Sign in" component={AuthStack} options={{drawerIcon: <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/> }}/>
+				    <Drawer.Screen name="Sign in" component={AuthStack} options={{drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>) }}/>
 				   )}
            
                 </Drawer.Navigator>

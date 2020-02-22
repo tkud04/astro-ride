@@ -16,14 +16,6 @@ import { Notifications } from 'expo';
 //var RNFS = require('react-native-fs');
 const LOCATION_TASK_NAME = 'background-location-task';
 
-const { width, height } = Dimensions.get('window');
-
-const ASPECT_RATIO = width / height;
-const LATITUDE = 37.78825;
-const LONGITUDE = -122.4324;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
 export default class DashboardScreen extends React.Component { 
    constructor(props) {
     super(props);
@@ -32,16 +24,10 @@ export default class DashboardScreen extends React.Component {
 	
 	
     this.state = { 
+                   	 mapRegion: null,
                      hasLocationPermissions: false,
                      locationResult: null,
                      markerCoords: {latitude: 0,longitude: 0},
-					 region: {
-                       latitude: LATITUDE,
-                       longitude: LONGITUDE,
-                       latitudeDelta: LATITUDE_DELTA,
-                       longitudeDelta: LONGITUDE_DELTA,
-                     },
-	                 isLoadingComplete: false
 				 };	
 				 
 	this.navv = null;
@@ -65,7 +51,7 @@ export default class DashboardScreen extends React.Component {
   }
   
   _test = () => {
-	 // this.navv.navigate('DisplayLatLng'); 
+	  this.navv.navigate('DisplayLatLng'); 
   }
 
   _getLocationAsync = async () => {
@@ -83,7 +69,7 @@ export default class DashboardScreen extends React.Component {
 	  
       // Center the map on the location we just fetched.
       this.setState({
-        region: {
+        mapRegion: {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           latitudeDelta: 0.0922,
@@ -100,7 +86,7 @@ export default class DashboardScreen extends React.Component {
   }
   
   _handleMapRegionChange = mapRegion => {
-    this.setState({region: mapRegion });
+    //this.setState({ mapRegion });
   };
   
   _continue = () => {
@@ -146,7 +132,7 @@ export default class DashboardScreen extends React.Component {
   render() {
 	 let navv = this.props.navigation;
 	  this.navv = navv;
-	  if(this.state.region !== null){
+	  if(this.state.mapRegion !== null){
 			console.log("current coords: ",this.state.markerCoords);
 		  
 	  }
@@ -155,30 +141,9 @@ export default class DashboardScreen extends React.Component {
 	        <Container>	     
 
 				   <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
-				     <MapView 
-					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 150}}
-					   region={this.state.region}
-                       onRegionChange={region => this._handleMapRegionChange(region)}
-   				     >
-				       <Marker
-					      coordinate={this.state.markerCoords}
-						  title="Sample Marker Title"
-                          description="This is a sample marker description"
-					   />
-					 </MapView>
-				   </Row>
-				   <Row>
-				    <TestView>
-					  <TestText></TestText>
-					</TestView>
-				   </Row>
-				   <Row style={{flex: 1,justifyContent: 'flex-end', width: '90%'}}>
-				   <SubmitButton
-				       onPress={() => {this._test()}}
-				       title="Submit"
-                    >
-                        <CButton title="Test" background="rgb(101, 33, 33)" color="#fff" />					   
-				    </SubmitButton>	
+				    <ProductInputWrapper>
+					  <ProductDescription>You have not made any trips yet.</ProductDescription>
+					</ProductInputWrapper>
                     </Row>					
 			</Container>
 			</BackgroundImage>

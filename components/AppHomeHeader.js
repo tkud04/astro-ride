@@ -4,9 +4,13 @@ import AppStyles from '../styles/AppStyles';
 import SvgIcon from './SvgIcon';
 import HeaderMenuButton from './HeaderMenuButton';
 import * as helpers from '../Helpers';
+import {useNavigation} from '@react-navigation/native';
 
 
 const AppHomeHeader = props => {
+		//console.log("r: ",props.r);
+		const navv = useNavigation();
+		
 return (
 <Container>
 <BackgroundImage source={require('../assets/images/header.jpg')}>
@@ -14,8 +18,8 @@ return (
 <OverlayView pointerEvents="none"></OverlayView>
 <HeaderView>
   <ButtonsView>
-  <MenuButton onPress={props.r.params.launchDrawer}>
-		  <HeaderMenuButton xml={AppStyles.svg.headerHamburger} w={30} h={30} ss={{marginLeft: 10, alignSelf: 'flex-start'}}/>
+  <MenuButton onPress={() => {console.log("pressing.."); navv.toggleDrawer()}}>
+		  <HeaderMenuButton xml={AppStyles.svg.headerHamburger} w={30} h={30} ss={{marginTop: 10, marginLeft: 20, alignSelf: 'flex-start'}}/>
 		</MenuButton>
 	<SvgView>
      <SvgIcon xml={helpers.insertAppStyle(props.xml)} w={40} h={40}/>
@@ -23,11 +27,10 @@ return (
   </SvgView>
   </ButtonsView>
   
-  <TitleView>
+  <TitleView sml={props.sml}>
   <Title>{props.subtitle}</Title>
   </TitleView>
 </HeaderView>  
-
 </Container>
 )
 };
@@ -46,7 +49,7 @@ right: 0;
 bottom: 0;
 
            width: 100%;
-		   height: 100%;
+		   height: ${AppStyles.headerHeight - 20};
 `;
 
 const Title = styled.Text`
@@ -59,29 +62,28 @@ const HeaderView = styled.View`
 flex-direction: column;
  justify-content: flex-start;
  align-items: flex-start;
-margin-left: 10;
+
 `;
 
 const ButtonsView = styled.View`
 flex-direction: row;
 justify-content: space-evenly;
-margin-top: 10px;
+margin-top: 20px;
  
 `;
 
 const SvgView = styled.View`
  width: 100%;
 align-items: center;
-margin-top: -5;
+margin-top: 5;
 margin-left: -10;
 `;
 
 const TitleView = styled.View`
-margin-top: 100px;
+margin-top: 75px;
+margin-left: ${props => props.sml}px;
 align-items: center;
 justify-content: center;
-margin-left: 90px;
-margin-bottom: 5px;
  
 `;
 
@@ -96,4 +98,5 @@ left: 0;
 right: 0;
 bottom: 0;
 background-color: rgba(101, 33, 33,0.5);
+height: ${AppStyles.headerHeight - 20};
 `;

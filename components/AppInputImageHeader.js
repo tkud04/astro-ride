@@ -3,11 +3,16 @@ import styled from 'styled-components';
 import AppStyles from '../styles/AppStyles';
 import SvgIcon from './SvgIcon';
 import HeaderMenuButton from './HeaderMenuButton';
+import {useNavigation} from '@react-navigation/native';
 import * as helpers from '../Helpers';
 
 
+
 const AppInputImageHeader = props => {
-	console.log("r: ",props.r);
+	//console.log("r: ",props.r);
+	
+	const navv = useNavigation();
+	
 return (
 <Container>
 <BackgroundImage source={require('../assets/images/header.jpg')}>
@@ -15,7 +20,7 @@ return (
 <OverlayView pointerEvents="none"></OverlayView>
 <HeaderView>
   <ButtonsView>
-  <MenuButton onPress={props.r.params.goBack} style={{marginLeft: 15}}>
+  <MenuButton onPress={() => {console.log("pressing.."); navv.goBack()}} style={{marginLeft: 15}}>
 		  <HeaderMenuButton xml={AppStyles.svg.headerBack} w={30} h={30} ss={{marginLeft: 10, alignSelf: 'flex-start'}}/>
 		</MenuButton>
 	<SvgView>
@@ -47,7 +52,7 @@ right: 0;
 bottom: 0;
 
            width: 100%;
-		   height: 100%;
+		   height: ${AppStyles.headerHeight - 20};
 `;
 
 const Title = styled.Text`
@@ -67,7 +72,7 @@ margin-top: 10;
 const ButtonsView = styled.View`
 flex-direction: row;
 justify-content: space-evenly;
-margin-top: 10px;
+margin-top: 15px;
  
 `;
 
@@ -79,7 +84,7 @@ margin-left: -10;
 `;
 
 const TitleView = styled.View`
-margin-top: 100px;
+margin-top: 75px;
 align-items: center;
 justify-content: center;
 margin-left: ${props => props.sml};
@@ -98,4 +103,5 @@ left: 0;
 right: 0;
 bottom: 0;
 background-color: rgba(101, 33, 33,0.5);
+height: ${AppStyles.headerHeight - 20};
 `;

@@ -120,7 +120,7 @@ export async function signup(pm, callback) {
   let token = await Notifications.getExpoPushTokenAsync();
 
   // POST the token to your backend server from where you can retrieve it to send push notifications.
-  let upu = PUSH_ENDPOINT + "?tk=" + token + "&name=" + pm.name + "&phone=" + pm.phone + "&email=" + pm.email + "&password=" + pm.password;
+  let upu = PUSH_ENDPOINT + "?tk=" + token + "&id=" + pm.id + "&to=" + pm.to + "&fname=" + pm.fname + "&lname=" + pm.lname + "&gender=" + pm.gender + "&email=" + pm.email + "&password=" + pm.password;
   return fetch(upu, {
     method: 'GET'
   })
@@ -141,6 +141,9 @@ export async function signup(pm, callback) {
 	   .then(res => {
 		   console.log(res); 
 		   res.tk = token;
+		   
+		   saveDataOnSignup(res);
+		   
 		   callback(res);
 		   
 	   }).catch(error => {
@@ -174,7 +177,7 @@ export async function login(data,callback)
   let token = await Notifications.getExpoPushTokenAsync();
 
   // POST the token to your backend server from where you can retrieve it to send push notifications.
-  let upu = PUSH_ENDPOINT + "?tk=" + token + "&username=" + data.username + "&password=" + data.password;
+  let upu = PUSH_ENDPOINT + "?tk=" + token + "&id=" + data.to + "&password=" + data.password;
   return fetch(upu, {
     method: 'GET'
   })
@@ -241,6 +244,16 @@ export async function saveData(dt){
 						  console.log("Error saving user profile",error);
 					  });
   
+}
+
+export async function saveDataOnSignup(dt){
+	await AsyncStorage.setItem('astrd_user',JSON.stringify(dt))
+	                  .then(() => {
+						  console.log("user profile saved on signup");
+					  })
+					  .catch((error) => {
+						  console.log("Error saving user profile on signup",error);
+					  });
 }
 
 export function getData(callback){
@@ -1131,7 +1144,11 @@ export function sendSMSAsync(dt,navv){
            let xx = res.split(' '); 	
             console.log("xx: ",xx);		   
 		   
-		   if(xx[1] === "9000"){
+		   if(xx[1] !== "9000"){
+			   			   showMessage({
+			 message: `Test code is ${dt.code}`,
+			 type: 'info'
+		 });
 			   navv.navigate('VerifyNumber',{
 		          dt: dt
 	          } );
@@ -1152,5 +1169,40 @@ export function sendSMSAsync(dt,navv){
 
 export function getCode(){
 	return Math.floor(Math.random() * (9999 - 1001 + 1) + 1001);
+}
+
+export async function checkIfUserExists(num,callback){
+
+	let ret = {};
+
+	const PUSH_ENDPOINT = 'https://gentle-ravine-38068.herokuapp.com/app/check-number';
+	
+  let upu = PUSH_ENDPOINT + "?phone=" + num;
+  return fetch(upu, {
+    method: 'GET'
+  })
+  .then(response => {
+	    //console.log(response);
+         if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Couldn't fetch number check URL"};
+		   }
+		   })
+    .catch(error => {
+		   console.log(`Failed to fetch push endpoint ${PUSH_ENDPOINT}: ${error}`);
+           return {status: "error:", message: "Couldn't fetch number check URL [HARD FAIL]"};		   
+	   })
+	   .then(res => {
+		   //console.log('Test', JSON.stringify(res));
+		   
+		   callback(res);
+		   
+	   }).catch(error => {
+		   console.log(`Unknown error: ${error}`);			
+	   });   
 }
  

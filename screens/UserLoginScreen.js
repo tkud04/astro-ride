@@ -16,18 +16,16 @@ import { Notifications } from 'expo';
 
 //var RNFS = require('react-native-fs');
 
-export default class AddLoginScreen extends React.Component { 
+export default class UserLoginScreen extends React.Component { 
    constructor(props) {
     super(props);
 	this.dt = props.route.params.dt;
 	
-    this.state = { emailBorderBottomColor: '#000',
-	               passwordBorderBottomColor: '#000',				  
-	               confirmPasswordBorderBottomColor: '#000',				  
+    this.state = { phoneBorderBottomColor: '#000',
+	               passwordBorderBottomColor: '#000',				  			  
 				   loading: false,
-				   email: "",			 
-				   password: "",			 
-				   confirmPassword: "none"                				   
+				   phone: this.dt.to,			 
+				   password: ""			              				   
 				 };	
 				 
 	this.navv = null;
@@ -40,12 +38,12 @@ export default class AddLoginScreen extends React.Component {
   _continue = (u, upp) => {
 	 //form validation
 	  
-  let validationErrors = (this.state.email.length < 6 || this.state.password.length < 6 || this.state.password !== this.state.confirmPassword);
+  let validationErrors = (this.state.phone.length < 6 || this.state.password.length < 6);
 	  if(validationErrors){
 	 
-	 if(this.state.email.length < 6){
+	 if(this.state.phone.length < 6){
 		 showMessage({
-			 message: "A valid email address is required",
+			 message: "A valid phone number is required",
 			 type: 'danger'
 		 });
 	 }
@@ -56,23 +54,15 @@ export default class AddLoginScreen extends React.Component {
 		 });
 	 }
 	 
-	 if(this.state.password !== this.state.confirmPassword){
-		 showMessage({
-			 message: "Passwords don't match",
-			 type: 'danger'
-		 });
-	 } 
-	 
 	}
 	
 	else{
-	  this.dt.email = this.state.email;
 	  this.dt.password = this.state.password;	  
 	  
 	  console.log("this.dt: ",this.dt);
 	  
 	  showMessage({
-			 message: "Creating your account..",
+			 message: "Signing you in..",
 			 type: 'info'
 		 });
 	  
@@ -81,16 +71,18 @@ export default class AddLoginScreen extends React.Component {
 
 		
 		 
-     helpers.signup(this.dt,(res) => {
+     helpers.login(this.dt,(res) => {
+		 console.log("res: ", res);
+		 
 		 if(res.status == "ok"){
 			    showMessage({
-			      message: "Signup successful! Fetching your dashboard..",
+			      message: "Welcome back! Fetching your dashboard..",
 			      type: 'success'
 		        });
-		        this.dt.tk = res.token;
+		       // dt.tk = res.token;
 				
 		        //Log user in
-		        upp([this.dt]);  
+		        upp([res.user]);  
 		   }
 		   else{
 			    showMessage({
@@ -99,6 +91,7 @@ export default class AddLoginScreen extends React.Component {
 		        });
 		    
 		   }
+		   
 	 });
 
 	}
@@ -113,23 +106,25 @@ export default class AddLoginScreen extends React.Component {
 		   <ScrollView>
 	        <Container>	     
                  
-				   <Row style={{flex: 1, marginTop: 10}}>
+				   <Row style={{flex: 1, marginTop: 10, height: '100%'}}>
 				     <ProductInputWrapper>
-					 <ProductDescription>Email address</ProductDescription>
+					 <ProductDescription>Phone number</ProductDescription>
 				    <ProductInput
-					style={{borderColor: this.state.emailBorderBottomColor,width: '70%'}}
-				     placeholder="Email address"
+					style={{borderColor: this.state.phoneBorderBottomColor,width: '70%'}}
+				     placeholder="Phone number"
+					 value={this.dt.to}
 				     onChangeText={text => {
-						this.setState({email: text});
+						this.setState({phone: text});
 					 }}
 					 onFocus={() => {
 						 
-						this.setState({emailBorderBottomColor: "#00a2e8"});
+						this.setState({phoneBorderBottomColor: "#00a2e8"});
 					 }}
 					 onBlur={() => {
 						
-						this.setState({emailBorderBottomColor: "#000"});
+						this.setState({phoneBorderBottomColor: "#000"});
 					 }}
+					  keyboardType="decimal-pad"
 					/>
 					</ProductInputWrapper>
 					<ProductInputWrapper>
@@ -151,25 +146,7 @@ export default class AddLoginScreen extends React.Component {
 					  secureTextEntry={true}
 					/>
 					</ProductInputWrapper>
-					<ProductInputWrapper>
-					 <ProductDescription>Confirm password</ProductDescription>
-				    <ProductInput
-					style={{borderColor: this.state.confirmPasswordBorderBottomColor,width: '70%'}}
-				     placeholder="Confirm password"
-				     onChangeText={text => {
-						this.setState({confirmPassword: text});
-					 }}
-					 onFocus={() => {
-						 
-						this.setState({confirmPasswordBorderBottomColor: "#00a2e8"});
-					 }}
-					 onBlur={() => {
-						
-						this.setState({confirmPasswordBorderBottomColor: "#000"});
-					 }}
-					  secureTextEntry={true}
-					/>
-					</ProductInputWrapper>
+					
 				   </Row>
 				   
 				  

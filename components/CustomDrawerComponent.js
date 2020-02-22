@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import AppStyles from '../styles/AppStyles';
 import SvgIcon from './SvgIcon';
 import * as helpers from '../Helpers';
-import NavigationService from '../navigation/NavigationService.js';
+import {useNavigation} from '@react-navigation/native';
 import {
   DrawerContentScrollView,
   DrawerItemList,
@@ -27,54 +27,38 @@ _getEmail = (u) =>{
 }
 
 _goToProfile = (u) =>{
-	NavigationService.navigate('Profile', { user: u });
+	console.log("u: ", u);
+	//n.navigate('Profile', { user: u });
 }
 const ripple = TouchableNativeFeedback.Ripple('#adacac', false);
-const CustomDrawerComponent = props => (
-  <View style={{ flex: 1 }}>
-
-        <ScrollView>
-          <SafeAreaView
-            style={{flex: 1}}
-            forceInset={{ top: 'always', horizontal: 'never' }}
-          >
-		    
-			<ThemeContext.Consumer>
+const CustomDrawerComponent = props => {
+	
+  //const navv = useNavigation();
+  return (
+  <ThemeContext.Consumer>
              {theme => (
                <UserContext.Consumer>
 			   {({user,up,loggedIn}) => {
 				   helpers.getLoggedInUser().then((dt) => {
 					   
 		 });
-				   return (
-		     <View>
-			
-			<ProfileButton
+		    return (
+			    <DrawerContentScrollView {...props}>
+				
+				  <ProfileButton
 			  onPress={() => {_goToProfile(user)}}
 			 >
             <View style={{ backgroundColor: AppStyles.headerBackground }}>
               <View style={{flexDirection: 'row', marginLeft: 10, marginVertical: 10}}>
 			    <Logo source={require('../assets/images/bg.jpg')}/>
-				<Username style={{ color: '#f9f9f9', marginTop: '20%', marginLeft: '5%', fontFamily: 'sans-serif-condensed' }}>{`${_getName(user)}`}</Username>
+				<Username style={{ color: '#f9f9f9', marginTop: '15%', marginLeft: '5%', fontFamily: 'sans-serif-condensed' }}>{`${_getName(user)}`}</Username>
               </View>
             </View>
 			</ProfileButton>
-			 <View>
-			    <DrawerContentScrollView {...props}>
+				
 				  <DrawerItemList {...props}/>
-			    </DrawerContentScrollView>
-			 </View>  
-			 
-			</View>
-			  )
-			   }}
-              </UserContext.Consumer>
-              )}
-             </ThemeContext.Consumer>		
-           
-          </SafeAreaView>
-        </ScrollView>
-        <View elevation={6} style={{ backgroundColor: '#ffffff' }}>
+				  
+				  <View elevation={6} style={{ backgroundColor: '#ffffff' }}>
           <TouchableNativeFeedback background={ripple}>
             <FooterItem>
               <SvgIcon xml={AppStyles.svg.cardUsers} w="10%" h="10%"/>
@@ -82,9 +66,16 @@ const CustomDrawerComponent = props => (
             </FooterItem>
           </TouchableNativeFeedback>
         </View>
-
-      </View>
-);
+		
+			    </DrawerContentScrollView>
+			
+			);
+			   }}
+			  </UserContext.Consumer>
+              )}
+             </ThemeContext.Consumer>
+)
+};
 
 export default CustomDrawerComponent;
 
@@ -129,7 +120,7 @@ const Logo = styled.Image`
 		   height: 80px;
 		   background: black;
 		   border-radius: 44px;
-		   margin-top: 25px;
+		   margin-top: 15px;
 `;
 
 const ProfileButton = styled.TouchableOpacity`
