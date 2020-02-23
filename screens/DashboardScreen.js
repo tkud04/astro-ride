@@ -34,6 +34,7 @@ export default class DashboardScreen extends React.Component {
     this.state = { 
                      hasLocationPermissions: false,
                      locationResult: null,
+					 address: "",
                      markerCoords: {latitude: 0,longitude: 0},
 					 region: {
                        latitude: LATITUDE,
@@ -74,7 +75,9 @@ export default class DashboardScreen extends React.Component {
       this.setState({ hasLocationPermissions: true });
 
       let location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.Highest});
-      this.setState({ locationResult: JSON.stringify(location) });
+	  let address = await helpers.getAddress({latitude: location.coords.latitude, longitude: location.coords.longitude});
+	  console.log("Address: ",address);
+      this.setState({ locationResult: JSON.stringify(location),  address: address.formatted_address});
       this.setState({ markerCoords: {
 		     latitude: location.coords.latitude,
 		     longitude: location.coords.longitude
@@ -97,6 +100,7 @@ export default class DashboardScreen extends React.Component {
 			 type: 'warning'
 		 });
 	}
+	this.setState({ isLoadingComplete: true});
   }
   
   _handleMapRegionChange = mapRegion => {
@@ -155,6 +159,7 @@ export default class DashboardScreen extends React.Component {
 	        <Container>	     
 
 				   <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
+					  {this.state.isLoadingComplete ? (
 				     <MapView 
 					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 150}}
 					   region={this.state.region}
@@ -162,12 +167,17 @@ export default class DashboardScreen extends React.Component {
    				     >
 				       <Marker
 					      coordinate={this.state.markerCoords}
-						  title="Sample Marker Title"
-                          description="This is a sample marker description"
+						  title="Your current location"
+                          description={this.state.address}
 					   />
-					 </MapView>
+					 </MapView>			   	
+				   ) : (
+					    <NoteView>
+						  <Note>Loading..</Note>
+						</NoteView>
+					  )}
 				   </Row>
-				   <Row>
+				    <Row>
 				    <TestView>
 					  <TestText></TestText>
 					</TestView>
@@ -298,6 +308,13 @@ const TestView = styled.View`
 `;
 
 const TestText = styled.Text` 
+                   color: rgb(101, 33, 33);
+				   margin-bottom: 6px;
+				   font-size: 16px;
+				   padding: 8px;
+`;
+
+const Note = styled.Text` 
                    color: rgb(101, 33, 33);
 				   margin-bottom: 6px;
 				   font-size: 16px;

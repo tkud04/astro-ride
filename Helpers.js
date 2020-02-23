@@ -1205,4 +1205,37 @@ export async function checkIfUserExists(num,callback){
 		   console.log(`Unknown error: ${error}`);			
 	   });   
 }
+
+export async function getAddress(data)
+{
+	let latlng = `${data.latitude},${data.longitude}`;
+	const upu = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latlng}&key=AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM`;
+	
+  return fetch(upu, {
+    method: 'GET'
+  })
+  .then(response => {
+	    //console.log(response);
+         if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Couldn't get address, response returned with status " + response.status};
+		   }
+		   })
+    .catch(error => {
+		   console.log(`Failed to fetch push endpoint ${PUSH_ENDPOINT}: ${error}`);
+           return {status: "error:", message: "Couldn't fetch login URL [HARD FAIL]"};		   
+	   })
+	   .then(res => {
+		   //console.log('Test', JSON.stringify(res));
+		   
+		   return res;
+		   
+	   }).catch(error => {
+		   console.log(`Unknown error: ${error}`);			
+	   });   
+}
  
