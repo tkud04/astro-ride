@@ -137,7 +137,7 @@ class DisplayLatLng extends React.Component {
           ref={ref => {
             this.map = ref;
           }}
-          mapType={MAP_TYPES.TERRAIN}
+          mapType={MAP_TYPES.STANDARD}
           style={styles.map}
           initialRegion={this.state.region}
           onRegionChange={region => this.onRegionChange(region)}

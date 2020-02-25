@@ -6,9 +6,9 @@ import AppHomeHeader from '../components/AppHomeHeader';
 import AppStyles from '../styles/AppStyles';
 import DashboardScreen from '../screens/DashboardScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import TripsScreen from '../screens/TripsScreen';
-import PaymentScreen from '../screens/PaymentScreen';
-import DisplayLatLng from '../screens/DisplayLatLng';
+import SetDestinationScreen from '../screens/SetDestinationScreen';
+import ConfirmRideScreen from '../screens/ConfirmRideScreen';
+
 
 /////////////////////////////////////////////////
 
@@ -32,33 +32,34 @@ let AppStack = () => (
 	              
                 />
                   <Stack.Screen
-                  name="Trips"
-	              component={TripsScreen}
+                  name="SetDestination"
+	              component={SetDestinationScreen}
 				  options={({route}) => ({
 					headerStyle: {
 		            backgroundColor: AppStyles.headerBackground,
 		            height: AppStyles.headerHeight
 	              },
-	             header: () => <AppHomeHeader xml={AppStyles.svg.chartBar}  r = {route} title="AstroRide" subtitle="Trips"  sml={40}/>,
+	             header: () => <AppInputImageHeader xml={AppStyles.svg.headerPhone}  leftParam = "goBack"  r = {route} title="AstroRide" subtitle="Where are you going?"  sml={40}/>,
 	             headerTintColor: AppStyles.headerColor,
 	             headerLeft: null  
 				  })}
 	              
                 /> 		
 				<Stack.Screen
-                  name="Payment"
-	              component={PaymentScreen}
+                  name="ConfirmRide"
+	              component={ConfirmRideScreen}
 				  options={({route}) => ({
 					headerStyle: {
 		            backgroundColor: AppStyles.headerBackground,
 		            height: AppStyles.headerHeight
 	              },
-	             header: () => <AppHomeHeader xml={AppStyles.svg.chartBar}  r = {route} title="AstroRide" subtitle="Payment"  sml={40}/>,
+	             header: () => <AppInputImageHeader xml={AppStyles.svg.headerPhone}  leftParam = "goBack"  r = {route} title="AstroRide" subtitle="Confirm ride"  sml={40}/>,
 	             headerTintColor: AppStyles.headerColor,
 	             headerLeft: null  
 				  })}
 	              
-                /> 				
+                /> 		
+					
 				
                 </Stack.Navigator>
 );

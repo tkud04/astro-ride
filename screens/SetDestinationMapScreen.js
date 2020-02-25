@@ -6,8 +6,8 @@ import * as helpers from '../Helpers';
 import MapView,{Marker} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import TitleHeader from '../components/TitleHeader';
+import SvgIcon from '../components/SvgIcon';
 import * as Permissions from 'expo-permissions';
-import {ThemeContext,UserContext} from '../MyContexts';
 import * as Location from 'expo-location';
 import {ScrollView, Dimensions} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
@@ -25,17 +25,18 @@ const LONGITUDE = -122.4324;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-export default class DashboardScreen extends React.Component { 
+export default class SetDestinationMapScreen extends React.Component { 
    constructor(props) {
     super(props);
 	this.props.navigation.setParams({launchDrawer: this.launchDrawer});	
-	//this.dt = props.navigation.state.params.dt;
+	this.dt = props.route.params.dt;
 	
 	
     this.state = { 
                      hasLocationPermissions: false,
                      locationResult: null,
 					 address: "",
+					 toAddress: "",
                      markerCoords: {latitude: 0,longitude: 0},
 					 region: {
                        latitude: LATITUDE,
@@ -44,7 +45,7 @@ export default class DashboardScreen extends React.Component {
                        longitudeDelta: LONGITUDE_DELTA,
                      },
 	                 isLoadingComplete: false,
-					 tryAgain: false
+					 hasDestination: false
 				 };	
 				 
 	this.navv = null;
@@ -58,43 +59,52 @@ export default class DashboardScreen extends React.Component {
   }
 	  
   
-  _testt = async () => {
-	  const { status } = await Location.requestPermissionsAsync();
-    if (status === 'granted') {
-      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.Balanced,
-      });
-    }
-  }
-  
   _next = async () => {
-	  let dt = {
-		    origin:{
-		      latlng: this.state.markerCoords,
-		      formattedAddress: this.state.address
-			}
-		  };
-	 this.navv.navigate('SetDestination',{
-		   dt: dt
-	    });
+	// this.navv.navigate('ConfirmRide'); 
   }
 
   _getLocationAsync = async () => {
-	  this.setState({ tryAgain: false});
 	  const { status } = await Location.requestPermissionsAsync();
     if (status === 'granted') {
-      this.setState({ hasLocationPermissions: true });
+      this.setState({ hasLocationPermissions: true });   
+	  this.setState({ address: this.dt.origin.formattedAddress});
+      this.setState({ markerCoords: {
+		     latitude: this.dt.origin.latlng.latitude,
+		     longitude: this.dt.origin.latlng.longitude
+		    }
+			});
+	  
+      // Center the map on the location we just fetched.
+      this.setState({
+        region: {
+          latitude: this.dt.origin.latlng.latitude,
+          longitude: this.dt.origin.latlng.longitude,
+          latitudeDelta: 0.007,
+          longitudeDelta: 0.007,
+        },
+      });
+    }
+	else{
+		showMessage({
+			 message: "Locations permissions not granted",
+			 type: 'warning'
+		 });
+	}
+	this.setState({ isLoadingComplete: true});
+  }
+  
+  _handleMapRegionChange = mapRegion => {
+   // this.setState({region: mapRegion });
+  };
 
-      let location = await Location.getCurrentPositionAsync({});
-	  console.log("Current position: ",location);
-	  let address = await helpers.getAddress({latitude: location.coords.latitude, longitude: location.coords.longitude});
+  _setDestination = async (data) => {
+   console.log("data: ",data);
+   if(this.state.hasLocationPermissions){
+	   let dest = data.coordinate;
+	   let address = await helpers.getAddress({latitude: dest.latitude, longitude: dest.longitude});
 	  console.log("Address: ",address);
 	  
-	  if(address.status === "error"){
-		   this.setState({ tryAgain: true});
-	  }
-	  else{
-		  //the results object is an array. we are using the first object returned ( of type ROOFTOP)
+	  //the results object is an array. we are using the first object returned ( of type ROOFTOP)
 	  let rooftop = address.results[0],addressComponents = rooftop.address_components;
 	  let formattedAddress = addressComponents[0].short_name;
 	 
@@ -103,77 +113,43 @@ export default class DashboardScreen extends React.Component {
 	  }
 	  
 	  console.log("Formatted address: ",formattedAddress);
-      this.setState({ locationResult: JSON.stringify(location),  address: formattedAddress});
-      this.setState({ markerCoords: {
-		     latitude: location.coords.latitude,
-		     longitude: location.coords.longitude
+	  this.setState({address: formattedAddress});
+	  
+	  //set the marker to the selected destination
+	  this.setState({ markerCoords: {
+		     latitude: dest.latitude,
+		     longitude: dest.longitude
 		    }
 			});
-	  
-      // Center the map on the location we just fetched.
+			
+	  // Center the map on the location we just fetched.
       this.setState({
         region: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
+          latitude: dest.latitude,
+          longitude: dest.longitude,
           latitudeDelta: 0.007,
           longitudeDelta: 0.007,
         },
       });
-	  this.setState({ isLoadingComplete: true});
-	  }
-	  
-    }
-	else{
-		showMessage({
+   }
+   else{
+	   showMessage({
 			 message: "Locations permissions not granted",
 			 type: 'warning'
 		 });
-	}
-	
-  }
-  
-  _handleMapRegionChange = mapRegion => {
+   }
    // this.setState({region: mapRegion });
   };
   
-  _continue = () => {
-	 //form validation
-	  
-  let validationErrors = (this.state.fname.length < 4 || this.state.lname.length < 4 || this.state.gender === "none");
-	  if(validationErrors){
-	 
-	 if(this.state.fname.length < 4){
-		 showMessage({
-			 message: "Your first name is required",
-			 type: 'danger'
-		 });
-	 }
-	 if(this.state.lname.length < 4){
-		 showMessage({
-			 message: "Your first name is required",
-			 type: 'danger'
-		 });
-	 }
-	 
-	 if(this.state.gender === "none"){
-		 showMessage({
-			 message: "Gender is required",
-			 type: 'danger'
-		 });
-	 } 
-	 
-	}
-	
-	else{
-	  this.dt.fname = this.state.fname;
-	  this.dt.lname = this.state.lname;	  
-	  this.dt.gender = this.state.gender;	  
-	 
-		this.navv.navigate('AddLogin',{
-		   dt: this.dt
-	    });
-	}
-	 
+  _next = () => {
+	  this.dt.destination = {
+		      latlng: this.state.markerCoords,
+		      formattedAddress: this.state.address
+			}
+			console.log(this.dt);
+			this.navv.navigate('ConfirmRide',{
+		       dt: this.dt
+	        });
   }
   
   render() {
@@ -190,19 +166,36 @@ export default class DashboardScreen extends React.Component {
 				   
 					  {this.state.isLoadingComplete ? (
 					 <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
-					 <UserContext.Consumer>
-					  {({user,up}) => (
-					   <WelcomeView>
-						  <WelcomeText>Welcome back, {user.fname}</WelcomeText>
-					  </WelcomeView>
-					  )}
-					   </UserContext.Consumer>	
-					  <SubmitButton
-				       onPress={() => {this._next()}}
-				       title="Submit"
-                    >
-                        <CButton title="Hitch a ride" background="rgb(101, 33, 33)" color="#fff" />					   
+					  {this.state.hasDestination ? (
+					  <TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Select destination on map"/>	
+					  ) : (
+					    <>
+					   <ProductInputWrapper>
+				    <ProductInput
+					style={{borderColor: this.state.toAddressBorderBottomColor,width: '70%'}}
+				     placeholder="Where are you going to?"
+				     onChangeText={text => {
+						this.setState({toAddress: text});
+					 }}
+					 onFocus={() => {
+						 
+						this.setState({toAddressBorderBottomColor: "#00a2e8"});
+					 }}
+					 onBlur={() => {
+						
+						this.setState({toAddressBorderBottomColor: "#000"});
+					 }}
+					/>
+					</ProductInputWrapper>
+					
+						<SubmitButton
+				         onPress={() => {this._next()}}
+				         title="Submit"
+                        >
+                        <CButton title="Select location on map" background="rgb(101, 33, 33)" color="#fff" />					   
 				    </SubmitButton>	
+						</>
+					  )}
 				     <MapView 
 					   ref={ref => {
                          this.map = ref;
@@ -211,10 +204,11 @@ export default class DashboardScreen extends React.Component {
 					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 200}}
 					   region={this.state.region}
                        onRegionChange={region => this._handleMapRegionChange(region)}
+					   onPress={e => this._setDestination(e.nativeEvent)}
    				     >
 				       <Marker
 					      coordinate={this.state.markerCoords}
-						  title="Your current location"
+						  title="Destination"
                           description={this.state.address}
 						  draggable={true}
 					   />
@@ -224,21 +218,9 @@ export default class DashboardScreen extends React.Component {
                     </Row>					
 				   ) : (
 				       <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
-					   {this.state.tryAgain ? (
-					   <NoteView>
-						  <Note>Couldn't load maps.. this seems to be a network problem.</Note>
-						  <SubmitButton
-				       onPress={() => {this._getLocationAsync()}}
-                    >
-                        <CButton title="Try again" background="rgb(101, 33, 33)" color="#fff" />					   
-				    </SubmitButton>	
-						</NoteView>
-					    
-                       ): (
-					     <NoteView>
+					    <NoteView>
 						  <Note>Loading..</Note>
-						</NoteView>
-					   )}						
+						</NoteView>					   
 				       </Row>
 					  )}
 				    <Row>
@@ -377,19 +359,6 @@ const Note = styled.Text`
 				   margin-bottom: 6px;
 				   font-size: 16px;
 				   padding: 8px;
-`;
-
-const WelcomeView = styled.View`
-
-`;
-
-const WelcomeText = styled.Text` 
-                   color: rgb(101, 33, 33);
-				   margin-bottom: 6px;
-				   font-size: 22px;
-				   font-weight: bold;
-				   padding: 8px;
-				   text-align: center;
 `;
 
 const BottomButtonText = styled.Text` 

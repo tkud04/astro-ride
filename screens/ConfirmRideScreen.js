@@ -5,9 +5,9 @@ import AppStyles from '../styles/AppStyles';
 import * as helpers from '../Helpers';
 import MapView,{Marker} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
+import SvgIcon from '../components/SvgIcon';
 import TitleHeader from '../components/TitleHeader';
 import * as Permissions from 'expo-permissions';
-import {ThemeContext,UserContext} from '../MyContexts';
 import * as Location from 'expo-location';
 import {ScrollView, Dimensions} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
@@ -25,26 +25,27 @@ const LONGITUDE = -122.4324;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-export default class DashboardScreen extends React.Component { 
+export default class ConfirmRideScreen extends React.Component { 
    constructor(props) {
     super(props);
 	this.props.navigation.setParams({launchDrawer: this.launchDrawer});	
-	//this.dt = props.navigation.state.params.dt;
+	this.dt = props.route.params.dt;
 	
 	
     this.state = { 
                      hasLocationPermissions: false,
                      locationResult: null,
-					 address: "",
-                     markerCoords: {latitude: 0,longitude: 0},
+					 fromAddress: "",
+                     fromMarkerCoords: {latitude: 0,longitude: 0},
+					 toAddress: "",
+                     toMarkerCoords: {latitude: 0,longitude: 0},
 					 region: {
                        latitude: LATITUDE,
                        longitude: LONGITUDE,
                        latitudeDelta: LATITUDE_DELTA,
                        longitudeDelta: LONGITUDE_DELTA,
                      },
-	                 isLoadingComplete: false,
-					 tryAgain: false
+	                 isLoadingComplete: false
 				 };	
 				 
 	this.navv = null;
@@ -58,70 +59,34 @@ export default class DashboardScreen extends React.Component {
   }
 	  
   
-  _testt = async () => {
-	  const { status } = await Location.requestPermissionsAsync();
-    if (status === 'granted') {
-      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.Balanced,
-      });
-    }
-  }
-  
   _next = async () => {
-	  let dt = {
-		    origin:{
-		      latlng: this.state.markerCoords,
-		      formattedAddress: this.state.address
-			}
-		  };
-	 this.navv.navigate('SetDestination',{
-		   dt: dt
-	    });
+	// this.navv.navigate('ConfirmRide'); 
   }
 
   _getLocationAsync = async () => {
-	  this.setState({ tryAgain: false});
 	  const { status } = await Location.requestPermissionsAsync();
     if (status === 'granted') {
-      this.setState({ hasLocationPermissions: true });
-
-      let location = await Location.getCurrentPositionAsync({});
-	  console.log("Current position: ",location);
-	  let address = await helpers.getAddress({latitude: location.coords.latitude, longitude: location.coords.longitude});
-	  console.log("Address: ",address);
-	  
-	  if(address.status === "error"){
-		   this.setState({ tryAgain: true});
-	  }
-	  else{
-		  //the results object is an array. we are using the first object returned ( of type ROOFTOP)
-	  let rooftop = address.results[0],addressComponents = rooftop.address_components;
-	  let formattedAddress = addressComponents[0].short_name;
-	 
-	  for(let i = 1; i < 4; i++){
-		  formattedAddress += " " + addressComponents[i].short_name;
-	  }
-	  
-	  console.log("Formatted address: ",formattedAddress);
-      this.setState({ locationResult: JSON.stringify(location),  address: formattedAddress});
-      this.setState({ markerCoords: {
-		     latitude: location.coords.latitude,
-		     longitude: location.coords.longitude
+      this.setState({ hasLocationPermissions: true });   
+	  this.setState({ fromAddress: this.dt.origin.formattedAddress, toAddress: this.dt.destination.formattedAddress});
+      this.setState({ fromMarkerCoords: {
+		     latitude: this.dt.origin.latlng.latitude,
+		     longitude: this.dt.origin.latlng.longitude
+		    },
+			toMarkerCoords: {
+		     latitude: this.dt.destination.latlng.latitude,
+		     longitude: this.dt.destination.latlng.longitude
 		    }
 			});
 	  
       // Center the map on the location we just fetched.
       this.setState({
         region: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
+          latitude: this.dt.origin.latlng.latitude,
+          longitude: this.dt.origin.latlng.longitude,
           latitudeDelta: 0.007,
           longitudeDelta: 0.007,
         },
       });
-	  this.setState({ isLoadingComplete: true});
-	  }
-	  
     }
 	else{
 		showMessage({
@@ -129,51 +94,15 @@ export default class DashboardScreen extends React.Component {
 			 type: 'warning'
 		 });
 	}
-	
+	this.setState({ isLoadingComplete: true});
   }
   
   _handleMapRegionChange = mapRegion => {
    // this.setState({region: mapRegion });
   };
-  
-  _continue = () => {
-	 //form validation
-	  
-  let validationErrors = (this.state.fname.length < 4 || this.state.lname.length < 4 || this.state.gender === "none");
-	  if(validationErrors){
-	 
-	 if(this.state.fname.length < 4){
-		 showMessage({
-			 message: "Your first name is required",
-			 type: 'danger'
-		 });
-	 }
-	 if(this.state.lname.length < 4){
-		 showMessage({
-			 message: "Your first name is required",
-			 type: 'danger'
-		 });
-	 }
-	 
-	 if(this.state.gender === "none"){
-		 showMessage({
-			 message: "Gender is required",
-			 type: 'danger'
-		 });
-	 } 
-	 
-	}
-	
-	else{
-	  this.dt.fname = this.state.fname;
-	  this.dt.lname = this.state.lname;	  
-	  this.dt.gender = this.state.gender;	  
-	 
-		this.navv.navigate('AddLogin',{
-		   dt: this.dt
-	    });
-	}
-	 
+
+  _next = () => {
+			console.log("dt: ",this.dt);
   }
   
   render() {
@@ -190,18 +119,31 @@ export default class DashboardScreen extends React.Component {
 				   
 					  {this.state.isLoadingComplete ? (
 					 <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
-					 <UserContext.Consumer>
-					  {({user,up}) => (
-					   <WelcomeView>
-						  <WelcomeText>Welcome back, {user.fname}</WelcomeText>
-					  </WelcomeView>
-					  )}
-					   </UserContext.Consumer>	
-					  <SubmitButton
-				       onPress={() => {this._next()}}
-				       title="Submit"
-                    >
-                        <CButton title="Hitch a ride" background="rgb(101, 33, 33)" color="#fff" />					   
+						<StatsView>
+						  <RideView>
+						  <LogoView>
+						     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.logoCar)} w={30} h={20}/>
+						  </LogoView>
+                            <RideType>
+							  <AstroTextView>
+							     <AstroText>Astro Go</AstroText>
+							     <PassengersView>
+								    <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUsers)} w={30} h={20}/>
+									<PassengersText>4</PassengersText>
+								 </PassengersView>
+							  </AstroTextView>
+							</RideType>	
+                            <PriceView>
+							  <PriceText>N2050 to N2650</PriceText>
+							</PriceView>							
+						  </RideView>
+						  <PaymentTypeView></PaymentTypeView>
+						</StatsView>
+						<SubmitButton
+				         onPress={() => {this._next()}}
+				         title="Submit"
+                        >
+                        <CButton title="Next" background="rgb(101, 33, 33)" color="#fff" />					   
 				    </SubmitButton>	
 				     <MapView 
 					   ref={ref => {
@@ -211,12 +153,22 @@ export default class DashboardScreen extends React.Component {
 					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 200}}
 					   region={this.state.region}
                        onRegionChange={region => this._handleMapRegionChange(region)}
+					   //onPress={e => this._setDestination(e.nativeEvent)}
+					    onMapReady={() => {this.map.fitToSuppliedMarkers(['origin','destination'],{ edgePadding:{top: 50,right: 50, bottom: 50,left: 50}})}}
    				     >
 				       <Marker
-					      coordinate={this.state.markerCoords}
-						  title="Your current location"
-                          description={this.state.address}
+					      coordinate={this.state.toMarkerCoords}
+						  title="Destination"
+                          description={this.state.toAddress}
 						  draggable={true}
+						  identifier="destination"
+					   />
+					   <Marker
+					      coordinate={this.state.fromMarkerCoords}
+						  title="Origin"
+                          description={this.state.fromAddress}
+						  draggable={true}
+						  identifier="origin"
 					   />
 					 </MapView>	
                     
@@ -224,21 +176,9 @@ export default class DashboardScreen extends React.Component {
                     </Row>					
 				   ) : (
 				       <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
-					   {this.state.tryAgain ? (
-					   <NoteView>
-						  <Note>Couldn't load maps.. this seems to be a network problem.</Note>
-						  <SubmitButton
-				       onPress={() => {this._getLocationAsync()}}
-                    >
-                        <CButton title="Try again" background="rgb(101, 33, 33)" color="#fff" />					   
-				    </SubmitButton>	
-						</NoteView>
-					    
-                       ): (
-					     <NoteView>
+					    <NoteView>
 						  <Note>Loading..</Note>
-						</NoteView>
-					   )}						
+						</NoteView>					   
 				       </Row>
 					  )}
 				    <Row>
@@ -325,10 +265,10 @@ const ContactText = styled.Text`
 `;
 					 
 const Logo = styled.Image`
-           width: 66px;
-		   height: 66px;
+           width: 44px;
+		   height: 44px;
 		   background: black;
-		   border-radius: 33px;
+		   border-radius: 22px;
 		   margin-left: 8px;
 `;
 
@@ -379,19 +319,6 @@ const Note = styled.Text`
 				   padding: 8px;
 `;
 
-const WelcomeView = styled.View`
-
-`;
-
-const WelcomeText = styled.Text` 
-                   color: rgb(101, 33, 33);
-				   margin-bottom: 6px;
-				   font-size: 22px;
-				   font-weight: bold;
-				   padding: 8px;
-				   text-align: center;
-`;
-
 const BottomButtonText = styled.Text` 
                    color: rgb(101, 33, 33);
 				   margin-bottom: 6px;
@@ -411,3 +338,69 @@ const BottomButton = styled.TouchableOpacity`
     justify-content: center;
     margin-horizontal: 5;
 `;
+const StatsView = styled.View`
+   margin: 5px;
+   width: 100%;
+   align-items: stretch;
+`;
+
+const RideView = styled.View`
+    justify-content: space-between;
+	flex-direction: row;
+	width: 70%;
+`;
+
+const PaymentTypeView = styled.View`
+   align-items: stretch;
+`;
+
+const AstroTextView = styled.View`
+  flex-direction: row;
+`;
+
+const AstroText = styled.Text` 
+                   color: rgb(101, 33, 33);
+				   margin-bottom: 4px;
+				   font-size: 20px;
+				   padding: 8px;
+				   font-weight: bold;
+`;
+
+const PassengersView = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+const PassengersText = styled.Text` 
+                   color: rgb(101, 33, 33);
+				   margin-bottom: 4px;
+				   margin-left: 5px;
+				   
+				   font-weight: bold;
+`;
+
+const RideType = styled.View`
+    align-items: center;
+	flex-direction: row;
+`;
+
+const PriceView = styled.View`
+   align-items: center;
+   justify-content: center;
+   margin-left: 20;
+`;
+
+const PriceText = styled.Text`
+   font-size: 10px;
+   font-weight: bold;
+   color: rgb(101, 33, 33);
+`;
+
+const LogoView = styled.View`
+   align-items: center;
+   justify-content: center;
+   margin-left: 10;
+`;
+
+
