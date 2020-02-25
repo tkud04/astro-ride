@@ -1239,6 +1239,38 @@ export async function getAddress(data)
 	   });   
 }
 
+export async function searchAddress(data)
+{
+	const upu = `https://maps.googleapis.com/maps/api/geocode/json?address=${data.address}&key=AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM`;
+	console.log("upu: ",upu);
+  return fetch(upu, {
+    method: 'GET'
+  })
+  .then(response => {
+	    //console.log(response);
+         if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Couldn't get address, response returned with status " + response.status};
+		   }
+		   })
+    .catch(error => {
+		   console.log(`Failed to fetch  ${upu}: ${error}`);
+           return {status: "error:", message: "Couldn't fetch getAddress URL [HARD FAIL]"};		   
+	   })
+	   .then(res => {
+		   //console.log('Test', JSON.stringify(res));
+		   
+		   return res;
+		   
+	   }).catch(error => {
+		   console.log(`Unknown error: ${error}`);			
+	   });   
+}
+
 export async function getDirections(data)
 {
 	let from = `${data.from.latitude},${data.from.longitude}`, to = `${data.to.latitude},${data.to.longitude}`;

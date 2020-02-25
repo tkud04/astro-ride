@@ -46,6 +46,7 @@ export default class SetDestinationScreen extends React.Component {
                        longitudeDelta: LONGITUDE_DELTA,
                      },
 	                 isLoadingComplete: false,
+					 irrelevant: false,
 					 hasDestination: false,
 					 toAddressBorderColor: "#eee"
 				 };	
@@ -103,8 +104,13 @@ export default class SetDestinationScreen extends React.Component {
    console.log("data: ",data);
    if(this.state.hasLocationPermissions){
 	   let dest = data.coordinate;
-	   let address = await helpers.getAddress({latitude: dest.latitude, longitude: dest.longitude});
+	   let address = await helpers.searchAddress({address: data});
 	  console.log("Address: ",address);
+	  
+	  if(address.results.length < 1){
+		  this.setState({address: "No results found."});
+	  }
+	  else{
 	  
 	  //the results object is an array. we are using the first object returned ( of type ROOFTOP)
 	  let rooftop = address.results[0],addressComponents = rooftop.address_components;
@@ -115,24 +121,10 @@ export default class SetDestinationScreen extends React.Component {
 	  }
 	  
 	  console.log("Formatted address: ",formattedAddress);
-	  this.setState({address: formattedAddress});
+	  this.setState({address: formattedAddress});	  
+	  }
 	  
-	  //set the marker to the selected destination
-	  this.setState({ markerCoords: {
-		     latitude: dest.latitude,
-		     longitude: dest.longitude
-		    }
-			});
-			
-	  // Center the map on the location we just fetched.
-      this.setState({
-        region: {
-          latitude: dest.latitude,
-          longitude: dest.longitude,
-          latitudeDelta: 0.007,
-          longitudeDelta: 0.007,
-        },
-      });
+	  this.setState({hasDestination: true});
    }
    else{
 	   showMessage({
@@ -154,6 +146,27 @@ export default class SetDestinationScreen extends React.Component {
 	        });
   }
   
+
+  _setDestinationMap = () => {
+			console.log(this.dt);
+			/**this.navv.navigate('ConfirmRide',{
+		       dt: this.dt
+	        });**/
+  }
+
+  _setDestinationText = async (hasDestination) => {
+			console.log(this.state.toAddress);
+			if(hasDestination){
+			  /**this.navv.navigate('ConfirmRide',{
+		       dt: this.dt
+	          });**/	
+			}
+			else{
+				this._setDestination(this.state.toAddress);
+			}
+			
+  }
+  
   render() {
 	 let navv = this.props.navigation;
 	  this.navv = navv;
@@ -168,7 +181,7 @@ export default class SetDestinationScreen extends React.Component {
 				   
 					  {this.state.isLoadingComplete ? (
 					 <Row style={{flex: 1, marginTop: 10, width: '100%',backgroundColor: 'rgba(0,0,0,0)'}}>
-					  {this.state.hasDestination ? (
+					  {this.state.irrelevant ? (
 					  <TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Select destination on map"/>	
 					  ) : (
 					    <>
@@ -190,25 +203,53 @@ export default class SetDestinationScreen extends React.Component {
 						
 						this.setState({toAddressBorderColor: "#eee"});
 					 }}
+					 onEndEditing={() => {this._setDestinationText(false)}}
 					/>
 					</ProductInputWrapper>
+					
 					
 					<HR color={AppStyles.themeColor}/>
 					
 					 <ProductInputWrapper style={{width: '100%', marginLeft: -5}}>
+					 {this.state.hasDestination ? (
+					 <>
+					<DestinationButton
+				         onPress={() => {this._setDestinationText(true)}}
+				         title="Submit"
+                        >
+                     <DestinationItemWrapper>
+					   <DestinationLogo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardDirections)} w={60} h={40}/>
+					   </DestinationLogo>
+					   <DestinationDescription>
+					     <DestinationText style={{borderColor: AppStyles.themeColorTransparent,width: '90%'}}>
+					       {this.state.address}
+					     </DestinationText>
+					   </DestinationDescription>
+					 </DestinationItemWrapper>		
+                      </DestinationButton>	
+                      <HR color={AppStyles.themeColor}/>
+                     </>					  
+					) : (null)}
+					
+					
 					 <DestinationItemWrapper>
 					   <DestinationLogo>
 					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardClock)} w={60} h={40}/>
 					   </DestinationLogo>
 					   <DestinationDescription>
 					     <DestinationText style={{borderColor: AppStyles.themeColorTransparent,width: '90%'}}>
-					       {this.dt.origin.formattedAddress}
+					      Previous locations will be shown here
 					     </DestinationText>
 					   </DestinationDescription>
 					 </DestinationItemWrapper>		
-                    
+                   
                      <HR color={AppStyles.themeColor}/>
-
+                     
+					  <DestinationButton
+				         onPress={() => {this._setDestinationMap()}}
+				         title="Submit"
+                        >
                      <DestinationItemWrapper>
 					   <DestinationLogo>
 					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardMapMarker)} w={60} h={40}/>
@@ -218,7 +259,8 @@ export default class SetDestinationScreen extends React.Component {
 					       Set location on map
 					     </DestinationText>
 					   </DestinationDescription>
-					 </DestinationItemWrapper>				 
+					 </DestinationItemWrapper>		
+                      </DestinationButton>					 
 					</ProductInputWrapper>
 				
 						</>
@@ -329,6 +371,10 @@ z-index: 6;
 `;
 
 const ImageUpload = styled.TouchableOpacity`
+
+`;
+
+const DestinationButton = styled.TouchableOpacity`
 
 `;
 
