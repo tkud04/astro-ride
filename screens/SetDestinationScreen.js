@@ -6,6 +6,7 @@ import * as helpers from '../Helpers';
 import MapView,{Marker} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import TitleHeader from '../components/TitleHeader';
+import HR from '../components/HR';
 import SvgIcon from '../components/SvgIcon';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
@@ -166,22 +167,17 @@ export default class SetDestinationScreen extends React.Component {
 
 				   
 					  {this.state.isLoadingComplete ? (
-					 <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
+					 <Row style={{flex: 1, marginTop: 10, width: '100%',backgroundColor: 'rgba(0,0,0,0)'}}>
 					  {this.state.hasDestination ? (
 					  <TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Select destination on map"/>	
 					  ) : (
 					    <>
 					   <ProductInputWrapper>
-				    <ProductInput
-					style={{placeholderTextColor: '#000', borderColor: '#eee',width: '90%'}}
-				     placeholder="Where are you going to?"
-				     onChangeText={text => {
-						this.setState({toAddress: text});
-					 }}					 
-					 editable={false}
-					/>
+				    <ProductText style={{borderColor: '#eee',width: '90%'}}>
+					  {this.dt.origin.formattedAddress}
+					</ProductText>
 					<ProductInput
-					style={{placeholderTextColor: '#000', borderColor: this.state.toAddressBorderColor,width: '90%'}}
+					style={{borderColor: this.state.toAddressBorderColor,width: '90%'}}
 				     placeholder="Where are you going to?"
 				     onChangeText={text => {
 						this.setState({toAddress: text});
@@ -197,6 +193,8 @@ export default class SetDestinationScreen extends React.Component {
 					/>
 					</ProductInputWrapper>
 					
+					<HR color={AppStyles.themeColor}/>
+					
 						<SubmitButton
 				         onPress={() => {this._next()}}
 				         title="Submit"
@@ -205,25 +203,7 @@ export default class SetDestinationScreen extends React.Component {
 				    </SubmitButton>	
 						</>
 					  )}
-				     <MapView 
-					   ref={ref => {
-                         this.map = ref;
-                       }}
-                       mapType="standard"
-					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 200}}
-					   region={this.state.region}
-                       onRegionChange={region => this._handleMapRegionChange(region)}
-					   onPress={e => this._setDestination(e.nativeEvent)}
-   				     >
-				       <Marker
-					      coordinate={this.state.markerCoords}
-						  title="Destination"
-                          description={this.state.address}
-						  draggable={true}
-					   />
-					 </MapView>	
-                    
-				     
+				    
                     </Row>					
 				   ) : (
 				       <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
@@ -261,6 +241,7 @@ const Container = styled.View`
 
 const ProductInputWrapper = styled.View` 
                    margin-left: 10px;
+				   margin-bottom: 10px;				  
 				   background-color: rgba(0,0,0,0);
 `;
 
@@ -276,8 +257,18 @@ const ProductInput = styled.TextInput`
 					 align-items: center;
 					 padding: 10px;
 					 margin-top: 5px;
-					 margin-bottom: 10px;
+					 margin-bottom: 5px;
 					 color: #000;
+					 border-width: 1;
+                     background-color: #fff;
+`;
+
+const ProductText = styled.Text`
+                     align-items: center;
+					 padding: 10px;
+					 margin-top: 5px;
+					 margin-bottom: 5px;
+					 color: ${AppStyles.themeColor};
 					 border-width: 1;
                      background-color: #fff;
 `;

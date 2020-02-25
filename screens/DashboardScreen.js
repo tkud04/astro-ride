@@ -78,6 +78,16 @@ export default class DashboardScreen extends React.Component {
 		   dt: dt
 	    });
   }
+  
+  _getGreeting = (fname) => {
+	  let today = new Date();
+	  let greeting = "Good evening, ";
+	  
+	  if(today.getHours() < 12) greeting = "Good morning, ";
+	  else if(today.getHours() < 17) greeting = "Good afternoon, ";
+	  greeting += fname;
+	  return greeting;
+  }
 
   _getLocationAsync = async () => {
 	  this.setState({ tryAgain: false});
@@ -154,7 +164,7 @@ export default class DashboardScreen extends React.Component {
 					 <UserContext.Consumer>
 					  {({user,up}) => (
 					   <WelcomeView>
-						  <WelcomeText>Welcome back, {user.fname}</WelcomeText>
+						  <WelcomeText>{this._getGreeting(user.fname)}</WelcomeText>
 					  </WelcomeView>
 					  )}
 					   </UserContext.Consumer>	
@@ -343,7 +353,9 @@ const Note = styled.Text`
 `;
 
 const WelcomeView = styled.View`
-
+border-bottom-width: 1;
+border-color: #eee;
+margin-bottom: 10;
 `;
 
 const WelcomeText = styled.Text` 

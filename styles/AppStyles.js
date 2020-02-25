@@ -1,6 +1,7 @@
 const ret = {
 	headerBackground: 'rgb(101, 23, 33)',
 	mainButtonBackground: 'rgb(101, 33, 33)',
+	themeColor: 'rgb(101, 33, 33)',
 	headerColor: '#fff',
 	headerHeight: 210,
 	fontStyle: 'normal',
