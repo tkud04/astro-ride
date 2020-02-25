@@ -173,7 +173,7 @@ export default class SetDestinationScreen extends React.Component {
 					  ) : (
 					    <>
 					   <ProductInputWrapper>
-				    <ProductText style={{borderColor: '#eee',width: '90%'}}>
+				    <ProductText style={{borderColor: AppStyles.themeColorTransparent,width: '90%'}}>
 					  {this.dt.origin.formattedAddress}
 					</ProductText>
 					<ProductInput
@@ -195,12 +195,32 @@ export default class SetDestinationScreen extends React.Component {
 					
 					<HR color={AppStyles.themeColor}/>
 					
-						<SubmitButton
-				         onPress={() => {this._next()}}
-				         title="Submit"
-                        >
-                        <CButton title="Select location on map" background="rgb(101, 33, 33)" color="#fff" />					   
-				    </SubmitButton>	
+					 <ProductInputWrapper style={{width: '100%', marginLeft: -5}}>
+					 <DestinationItemWrapper>
+					   <DestinationLogo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardClock)} w={60} h={40}/>
+					   </DestinationLogo>
+					   <DestinationDescription>
+					     <DestinationText style={{borderColor: AppStyles.themeColorTransparent,width: '90%'}}>
+					       {this.dt.origin.formattedAddress}
+					     </DestinationText>
+					   </DestinationDescription>
+					 </DestinationItemWrapper>		
+                    
+                     <HR color={AppStyles.themeColor}/>
+
+                     <DestinationItemWrapper>
+					   <DestinationLogo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardMapMarker)} w={60} h={40}/>
+					   </DestinationLogo>
+					   <DestinationDescription>
+					     <DestinationText style={{borderColor: AppStyles.themeColorTransparent,width: '90%'}}>
+					       Set location on map
+					     </DestinationText>
+					   </DestinationDescription>
+					 </DestinationItemWrapper>				 
+					</ProductInputWrapper>
+				
 						</>
 					  )}
 				    
@@ -245,6 +265,20 @@ const ProductInputWrapper = styled.View`
 				   background-color: rgba(0,0,0,0);
 `;
 
+const DestinationItemWrapper = styled.View` 
+                   flex-direction: row;
+`;
+
+const DestinationLogo = styled.View` 
+                   width: 20%;
+				   align-items: center;
+				   justify-content: center;
+`;
+
+const DestinationDescription = styled.View` 
+                   width: 80%;
+`;
+
 const ProductDescription = styled.Text` 
                    color: #000;
 				   margin-top: 12px;
@@ -268,8 +302,17 @@ const ProductText = styled.Text`
 					 padding: 10px;
 					 margin-top: 5px;
 					 margin-bottom: 5px;
-					 color: ${AppStyles.themeColor};
+					 color: #000;
 					 border-width: 1;
+                     background-color: #fff;
+`;
+
+const DestinationText = styled.Text`
+                     align-items: center;
+					 padding: 10px;
+					 margin-top: 5px;
+					 margin-bottom: 5px;
+					 color: #000;
                      background-color: #fff;
 `;
 
