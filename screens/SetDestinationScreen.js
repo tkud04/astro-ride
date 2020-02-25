@@ -9,7 +9,7 @@ import TitleHeader from '../components/TitleHeader';
 import SvgIcon from '../components/SvgIcon';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
-import {ScrollView, Dimensions} from 'react-native';
+import {ScrollView, Dimensions, ActivityIndicator} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 import { Notifications } from 'expo';
@@ -45,7 +45,8 @@ export default class SetDestinationScreen extends React.Component {
                        longitudeDelta: LONGITUDE_DELTA,
                      },
 	                 isLoadingComplete: false,
-					 hasDestination: false
+					 hasDestination: false,
+					 toAddressBorderColor: "#eee"
 				 };	
 				 
 	this.navv = null;
@@ -172,18 +173,26 @@ export default class SetDestinationScreen extends React.Component {
 					    <>
 					   <ProductInputWrapper>
 				    <ProductInput
-					style={{borderColor: this.state.toAddressBorderBottomColor,width: '70%'}}
+					style={{placeholderTextColor: '#000', borderColor: '#eee',width: '90%'}}
+				     placeholder="Where are you going to?"
+				     onChangeText={text => {
+						this.setState({toAddress: text});
+					 }}					 
+					 editable={false}
+					/>
+					<ProductInput
+					style={{placeholderTextColor: '#000', borderColor: this.state.toAddressBorderColor,width: '90%'}}
 				     placeholder="Where are you going to?"
 				     onChangeText={text => {
 						this.setState({toAddress: text});
 					 }}
 					 onFocus={() => {
 						 
-						this.setState({toAddressBorderBottomColor: "#00a2e8"});
+						this.setState({toAddressBorderColor: "#00a2e8"});
 					 }}
 					 onBlur={() => {
 						
-						this.setState({toAddressBorderBottomColor: "#000"});
+						this.setState({toAddressBorderColor: "#eee"});
 					 }}
 					/>
 					</ProductInputWrapper>
@@ -220,6 +229,7 @@ export default class SetDestinationScreen extends React.Component {
 				       <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
 					    <NoteView>
 						  <Note>Loading..</Note>
+						   <ActivityIndicator size="small" color="#0000ff" />
 						</NoteView>					   
 				       </Row>
 					  )}
@@ -251,6 +261,7 @@ const Container = styled.View`
 
 const ProductInputWrapper = styled.View` 
                    margin-left: 10px;
+				   background-color: rgba(0,0,0,0);
 `;
 
 const ProductDescription = styled.Text` 
@@ -258,20 +269,17 @@ const ProductDescription = styled.Text`
 				   margin-top: 12px;
 				   margin-bottom: 2px;
 				   font-size: 24px;
-				   
+				  
 `;
 					 
 const ProductInput = styled.TextInput`
 					 align-items: center;
-					 border: 1px solid #bbb;
 					 padding: 10px;
 					 margin-top: 5px;
-					 margin-bottom: 20px;
+					 margin-bottom: 10px;
 					 color: #000;
-					 border-left-width: 0;
-					 border-top-width: 0;
-					 border-right-width: 0;
-					 border-bottom-width: 3;
+					 border-width: 1;
+                     background-color: #fff;
 `;
 
 
@@ -340,7 +348,8 @@ const BottomInputs = styled.View`
 `;
 
 const NoteView = styled.View`
-
+flex-direction: row;
+justify-content: center;
 `;
 
 const TestView = styled.View`

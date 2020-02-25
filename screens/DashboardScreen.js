@@ -9,7 +9,7 @@ import TitleHeader from '../components/TitleHeader';
 import * as Permissions from 'expo-permissions';
 import {ThemeContext,UserContext} from '../MyContexts';
 import * as Location from 'expo-location';
-import {ScrollView, Dimensions} from 'react-native';
+import {ScrollView, Dimensions, ActivityIndicator} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 import { Notifications } from 'expo';
@@ -136,45 +136,6 @@ export default class DashboardScreen extends React.Component {
    // this.setState({region: mapRegion });
   };
   
-  _continue = () => {
-	 //form validation
-	  
-  let validationErrors = (this.state.fname.length < 4 || this.state.lname.length < 4 || this.state.gender === "none");
-	  if(validationErrors){
-	 
-	 if(this.state.fname.length < 4){
-		 showMessage({
-			 message: "Your first name is required",
-			 type: 'danger'
-		 });
-	 }
-	 if(this.state.lname.length < 4){
-		 showMessage({
-			 message: "Your first name is required",
-			 type: 'danger'
-		 });
-	 }
-	 
-	 if(this.state.gender === "none"){
-		 showMessage({
-			 message: "Gender is required",
-			 type: 'danger'
-		 });
-	 } 
-	 
-	}
-	
-	else{
-	  this.dt.fname = this.state.fname;
-	  this.dt.lname = this.state.lname;	  
-	  this.dt.gender = this.state.gender;	  
-	 
-		this.navv.navigate('AddLogin',{
-		   dt: this.dt
-	    });
-	}
-	 
-  }
   
   render() {
 	 let navv = this.props.navigation;
@@ -237,6 +198,7 @@ export default class DashboardScreen extends React.Component {
                        ): (
 					     <NoteView>
 						  <Note>Loading..</Note>
+						  <ActivityIndicator size="small" color="#0000ff" />
 						</NoteView>
 					   )}						
 				       </Row>
@@ -358,7 +320,8 @@ const BottomInputs = styled.View`
 `;
 
 const NoteView = styled.View`
-
+flex-direction: row;
+justify-content: center;
 `;
 
 const TestView = styled.View`
@@ -376,7 +339,7 @@ const Note = styled.Text`
                    color: rgb(101, 33, 33);
 				   margin-bottom: 6px;
 				   font-size: 16px;
-				   padding: 8px;
+
 `;
 
 const WelcomeView = styled.View`
