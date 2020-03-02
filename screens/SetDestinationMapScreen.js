@@ -9,7 +9,7 @@ import TitleHeader from '../components/TitleHeader';
 import SvgIcon from '../components/SvgIcon';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
-import {ScrollView, Dimensions} from 'react-native';
+import {ScrollView, Dimensions, ActivityIndicator} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 import { Notifications } from 'expo';
@@ -37,6 +37,7 @@ export default class SetDestinationMapScreen extends React.Component {
                      locationResult: null,
 					 address: "",
 					 toAddress: "",
+					 buttonText: "Select location on map",
                      markerCoords: {latitude: 0,longitude: 0},
 					 region: {
                        latitude: LATITUDE,
@@ -113,7 +114,7 @@ export default class SetDestinationMapScreen extends React.Component {
 	  }
 	  
 	  console.log("Formatted address: ",formattedAddress);
-	  this.setState({address: formattedAddress});
+	  this.setState({address: formattedAddress,buttonText: "Next"});
 	  
 	  //set the marker to the selected destination
 	  this.setState({ markerCoords: {
@@ -170,29 +171,12 @@ export default class SetDestinationMapScreen extends React.Component {
 					  <TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Select destination on map"/>	
 					  ) : (
 					    <>
-					   <ProductInputWrapper>
-				    <ProductInput
-					style={{borderColor: this.state.toAddressBorderBottomColor,width: '70%'}}
-				     placeholder="Where are you going to?"
-				     onChangeText={text => {
-						this.setState({toAddress: text});
-					 }}
-					 onFocus={() => {
-						 
-						this.setState({toAddressBorderBottomColor: "#00a2e8"});
-					 }}
-					 onBlur={() => {
-						
-						this.setState({toAddressBorderBottomColor: "#000"});
-					 }}
-					/>
-					</ProductInputWrapper>
-					
+					 
 						<SubmitButton
 				         onPress={() => {this._next()}}
 				         title="Submit"
                         >
-                        <CButton title="Select location on map" background="rgb(101, 33, 33)" color="#fff" />					   
+                        <CButton title={this.state.buttonText} background="rgb(101, 33, 33)" color="#fff" />					   
 				    </SubmitButton>	
 						</>
 					  )}
@@ -220,6 +204,7 @@ export default class SetDestinationMapScreen extends React.Component {
 				       <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
 					    <NoteView>
 						  <Note>Loading..</Note>
+						   <ActivityIndicator size="small" color="#0000ff" />
 						</NoteView>					   
 				       </Row>
 					  )}

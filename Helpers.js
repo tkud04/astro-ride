@@ -1273,6 +1273,7 @@ export async function searchAddress(data)
 
 export async function getDirections(data)
 {
+	//console.log("data: ",data);
 	let from = `${data.from.latitude},${data.from.longitude}`, to = `${data.to.latitude},${data.to.longitude}`;
 	const upu = `https://maps.googleapis.com/maps/api/directions/json?origin=${from}&destination=${to}&key=AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM`;
 	console.log("upu: ",upu);
@@ -1296,7 +1297,39 @@ export async function getDirections(data)
 	   })
 	   .then(res => {
 		   //console.log('Test', JSON.stringify(res));
+		   //console.log("res in 3rd then(): ",res);
+		   return res;
 		   
+	   }).catch(error => {
+		   console.log(`Unknown error: ${error}`);			
+	   });   
+}
+
+export async function decodeDirectionPoints(str)
+{
+	const upu = `https://gentle-ravine-38068.herokuapp.com/app/decode-points?points=${str}`;
+	console.log("upu: ",upu);
+  return fetch(upu, {
+    method: 'GET'
+  })
+  .then(response => {
+	    //console.log(response);
+         if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Couldn't decode points, response returned with status " + response.status};
+		   }
+		   })
+    .catch(error => {
+		   console.log(`Failed to fetch  ${upu}: ${error}`);
+           return {status: "error:", message: "Couldn't fetch decodeDirectionPoints URL [HARD FAIL]"};		   
+	   })
+	   .then(res => {
+		   //console.log('Test', JSON.stringify(res));
+		   //console.log("res in 3rd then(): ",res);
 		   return res;
 		   
 	   }).catch(error => {

@@ -121,7 +121,13 @@ export default class SetDestinationScreen extends React.Component {
 	  }
 	  
 	  console.log("Formatted address: ",formattedAddress);
-	  this.setState({address: formattedAddress});	  
+	  this.setState({
+		  address: formattedAddress,
+		  markerCoords:{
+		      latitude: rooftop.geometry.location.lat,
+		      longitude: rooftop.geometry.location.lng
+			}
+		  });	  
 	  }
 	  
 	  this.setState({hasDestination: true});
@@ -149,17 +155,22 @@ export default class SetDestinationScreen extends React.Component {
 
   _setDestinationMap = () => {
 			console.log(this.dt);
-			/**this.navv.navigate('ConfirmRide',{
+			this.navv.navigate('SetDestinationMap',{
 		       dt: this.dt
-	        });**/
+	        });
   }
 
   _setDestinationText = async (hasDestination) => {
 			console.log(this.state.toAddress);
 			if(hasDestination){
-			  /**this.navv.navigate('ConfirmRide',{
+			 this.dt.destination = {
+		      latlng: this.state.markerCoords,
+		      formattedAddress: this.state.address
+			}
+			 console.log("dt here: ",this.dt);
+			  this.navv.navigate('ConfirmRide',{
 		       dt: this.dt
-	          });**/	
+	          });	
 			}
 			else{
 				this._setDestination(this.state.toAddress);

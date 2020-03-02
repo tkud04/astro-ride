@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import CButton from '../components/CButton';
 import AppStyles from '../styles/AppStyles';
 import * as helpers from '../Helpers';
-import MapView,{Marker} from 'react-native-maps';
+import MapView,{Marker, Polyline} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import SvgIcon from '../components/SvgIcon';
 import TitleHeader from '../components/TitleHeader';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
-import {ScrollView, Dimensions} from 'react-native';
+import {ScrollView, Dimensions, ActivityIndicator} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 import { Notifications } from 'expo';
@@ -45,13 +45,15 @@ export default class ConfirmRideScreen extends React.Component {
                        latitudeDelta: LATITUDE_DELTA,
                        longitudeDelta: LONGITUDE_DELTA,
                      },
-	                 isLoadingComplete: false
+	                 isLoadingComplete: false,
+					 points:[]
 				 };	
 				 
 	this.navv = null;
     this.map = null;
 	
-	this._getLocationAsync();
+	this._init();
+	this._getDirections();
   }
   
     launchDrawer = () => {
@@ -63,7 +65,7 @@ export default class ConfirmRideScreen extends React.Component {
 	// this.navv.navigate('ConfirmRide'); 
   }
 
-  _getLocationAsync = async () => {
+  _init = async () => {
 	  const { status } = await Location.requestPermissionsAsync();
     if (status === 'granted') {
       this.setState({ hasLocationPermissions: true });   
@@ -97,12 +99,43 @@ export default class ConfirmRideScreen extends React.Component {
 	this.setState({ isLoadingComplete: true});
   }
   
+  _getDirections = async () => {
+	  console.log("this.dt: ",this.dt);
+	 let ret = {
+		 from:{
+			 latitude: this.dt.origin.latlng.latitude,
+			 longitude: this.dt.origin.latlng.longitude,
+		 },
+		 to:{
+			 latitude: this.dt.destination.latlng.latitude,
+			 longitude: this.dt.destination.latlng.longitude,
+		 }
+	 }
+	 
+	 let directions = await helpers.getDirections(ret);
+	 console.log("directions: ",directions);
+	 
+	 if(directions.routes.length > 0){
+		 let overlayPoints = directions.routes[0].overview_polyline.points;
+		 let points = await helpers.decodeDirectionPoints(overlayPoints);
+		 let rr = [];
+
+		 for(let i = 0; i < points.length;i++){
+			 let p = points[i];
+			 rr.push({latitude: p[0],longitude: p[1]});
+		 }
+		  //console.log("Points: ",rr);
+		  this.setState({points: rr});
+	 }
+   // this.setState({region: mapRegion });
+  };
+
   _handleMapRegionChange = mapRegion => {
    // this.setState({region: mapRegion });
   };
 
   _next = () => {
-			console.log("dt: ",this.dt);
+			//console.log("dt: ",this.dt);
   }
   
   render() {
@@ -143,7 +176,7 @@ export default class ConfirmRideScreen extends React.Component {
 				         onPress={() => {this._next()}}
 				         title="Submit"
                         >
-                        <CButton title="Next" background="rgb(101, 33, 33)" color="#fff" />					   
+                        <CButton title="Confirm" background="rgb(101, 33, 33)" color="#fff" />					   
 				    </SubmitButton>	
 				     <MapView 
 					   ref={ref => {
@@ -154,7 +187,7 @@ export default class ConfirmRideScreen extends React.Component {
 					   region={this.state.region}
                        onRegionChange={region => this._handleMapRegionChange(region)}
 					   //onPress={e => this._setDestination(e.nativeEvent)}
-					    onMapReady={() => {this.map.fitToSuppliedMarkers(['origin','destination'],{ edgePadding:{top: 50,right: 50, bottom: 50,left: 50}})}}
+					    onMapReady={() => {this.map.fitToSuppliedMarkers(['destination','origin'],{ edgePadding:{top: 50,right: 50, bottom: 50,left: 50}})}}
    				     >
 				       <Marker
 					      coordinate={this.state.toMarkerCoords}
@@ -170,6 +203,11 @@ export default class ConfirmRideScreen extends React.Component {
 						  draggable={true}
 						  identifier="origin"
 					   />
+					   <Polyline
+		                 coordinates={this.state.points}
+		                 strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider	
+		                 strokeWidth={6}
+	                   />
 					 </MapView>	
                     
 				     
@@ -178,6 +216,7 @@ export default class ConfirmRideScreen extends React.Component {
 				       <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
 					    <NoteView>
 						  <Note>Loading..</Note>
+						  <ActivityIndicator size="small" color="#0000ff" />
 						</NoteView>					   
 				       </Row>
 					  )}
