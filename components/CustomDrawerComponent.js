@@ -48,8 +48,8 @@ const CustomDrawerComponent = props => {
 				  <ProfileButton
 			  onPress={() => {_goToProfile(user)}}
 			 >
-            <View style={{ backgroundColor: AppStyles.headerBackground }}>
-              <View style={{flexDirection: 'row', marginLeft: 10, marginVertical: 10}}>
+            <View style={{ backgroundColor: AppStyles.headerBackground , paddingTop: 10, marginTop: -5}}>
+              <View style={{flexDirection: 'row', marginLeft: 10, marginBottom: 10, marginTop: 0}}>
 			    <Logo source={require('../assets/images/bg.jpg')}/>
 				<Username style={{ color: '#f9f9f9', marginTop: '15%', marginLeft: '5%', fontFamily: 'sans-serif-condensed' }}>{`${_getName(user)}`}</Username>
               </View>

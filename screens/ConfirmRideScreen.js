@@ -46,6 +46,7 @@ export default class ConfirmRideScreen extends React.Component {
                        longitudeDelta: LONGITUDE_DELTA,
                      },
 	                 isLoadingComplete: false,
+	                 focusMapLoading: true,
 					 points:[]
 				 };	
 				 
@@ -100,7 +101,7 @@ export default class ConfirmRideScreen extends React.Component {
   }
   
   _getDirections = async () => {
-	  console.log("this.dt: ",this.dt);
+	  //console.log("this.dt: ",this.dt);
 	 let ret = {
 		 from:{
 			 latitude: this.dt.origin.latlng.latitude,
@@ -113,7 +114,7 @@ export default class ConfirmRideScreen extends React.Component {
 	 }
 	 
 	 let directions = await helpers.getDirections(ret);
-	 console.log("directions: ",directions);
+	 //console.log("directions: ",directions);
 	 
 	 if(directions.routes.length > 0){
 		 let overlayPoints = directions.routes[0].overview_polyline.points;
@@ -136,6 +137,10 @@ export default class ConfirmRideScreen extends React.Component {
 
   _next = () => {
 			//console.log("dt: ",this.dt);
+  }
+  
+  _focusMap = () => {
+	  if(this.map !== null) this.map.fitToSuppliedMarkers(['origin','destination'],{ edgePadding:{top: 50,right: 50, bottom: 50,left: 50}});
   }
   
   render() {
@@ -181,13 +186,15 @@ export default class ConfirmRideScreen extends React.Component {
 				     <MapView 
 					   ref={ref => {
                          this.map = ref;
+						 this._focusMap();
+						
                        }}
                        mapType="standard"
 					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 200}}
 					   region={this.state.region}
                        onRegionChange={region => this._handleMapRegionChange(region)}
 					   //onPress={e => this._setDestination(e.nativeEvent)}
-					    onMapReady={() => {this.map.fitToSuppliedMarkers(['destination','origin'],{ edgePadding:{top: 50,right: 50, bottom: 50,left: 50}})}}
+					    onMapReady={() => {this._focusMap()}}
    				     >
 				       <Marker
 					      coordinate={this.state.toMarkerCoords}
@@ -206,7 +213,7 @@ export default class ConfirmRideScreen extends React.Component {
 					   <Polyline
 		                 coordinates={this.state.points}
 		                 strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider	
-		                 strokeWidth={6}
+		                 strokeWidth={3}
 	                   />
 					 </MapView>	
                     
