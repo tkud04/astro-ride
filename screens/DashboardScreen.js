@@ -6,6 +6,7 @@ import * as helpers from '../Helpers';
 import MapView,{Marker} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import TitleHeader from '../components/TitleHeader';
+import HeaderMenuButton from '../components/HeaderMenuButton';
 import * as Permissions from 'expo-permissions';
 import {ThemeContext,UserContext} from '../MyContexts';
 import * as Location from 'expo-location';
@@ -161,7 +162,29 @@ export default class DashboardScreen extends React.Component {
 				   
 					  {this.state.isLoadingComplete ? (
 					 <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
-					 <UserContext.Consumer>
+					 
+				     <MapView 
+					   ref={ref => {
+                         this.map = ref;
+                       }}
+                       mapType="standard"
+					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 220}}
+					   region={this.state.region}
+                       onRegionChange={region => this._handleMapRegionChange(region)}
+   				     >
+				       <Marker
+					      coordinate={this.state.markerCoords}
+						  title="Your current location"
+                          description={this.state.address}
+						  draggable={true}
+					   >
+					   <MarkerView>
+					  <HeaderMenuButton xml={AppStyles.svg.cardLocation} w={40} h={30} ss={{ alignItems: 'center', justifyContent: 'center'}}/>
+					  </MarkerView>
+					   </Marker>
+					 </MapView>	
+					 <WWrapper>
+                    <UserContext.Consumer>
 					  {({user,up}) => (
 					   <WelcomeView>
 						  <WelcomeText>{this._getGreeting(user.fname)}</WelcomeText>
@@ -172,26 +195,23 @@ export default class DashboardScreen extends React.Component {
 				       onPress={() => {this._next()}}
 				       title="Submit"
                     >
-                        <CButton title="Hitch a ride" background="rgb(101, 33, 33)" color="#fff" />					   
+                      <WhereToView>
+					    <WhereTo>Where to?</WhereTo>
+					  </WhereToView>		   
 				    </SubmitButton>	
-				     <MapView 
-					   ref={ref => {
-                         this.map = ref;
-                       }}
-                       mapType="standard"
-					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 200}}
-					   region={this.state.region}
-                       onRegionChange={region => this._handleMapRegionChange(region)}
-   				     >
-				       <Marker
-					      coordinate={this.state.markerCoords}
-						  title="Your current location"
-                          description={this.state.address}
-						  draggable={true}
-					   />
-					 </MapView>	
-                    
-				     
+					 <SubmitButton
+                    >
+				     <LastTripView>
+					   <LastTripIcon>
+					      <HeaderMenuButton xml={AppStyles.svg.cardMapMarker2} w={20} h={20} ss={{marginLeft: 4, alignItems: 'center', justifyContent: 'center'}}/>
+					   </LastTripIcon>
+					   <LastTrip>
+					     <TripLocation>No previous trips</TripLocation>
+					     <Address>Last trip address will be shown here</Address>
+					   </LastTrip>
+					 </LastTripView>
+					</SubmitButton>	
+					</WWrapper>
                     </Row>					
 				   ) : (
 				       <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
@@ -214,9 +234,7 @@ export default class DashboardScreen extends React.Component {
 				       </Row>
 					  )}
 				    <Row>
-				    <TestView>
-					  <TestText></TestText>
-					</TestView>
+				    
 				   </Row>
 				  		
 			</Container>
@@ -385,4 +403,55 @@ const BottomButton = styled.TouchableOpacity`
     align-items: center;
     justify-content: center;
     margin-horizontal: 5;
+`;
+
+const WWrapper = styled.View`
+
+`;
+
+const WhereToView = styled.View`
+background-color: #dedede;
+margin-bottom: 10px;
+margin-left: 5px;
+width: 90%;
+`;
+
+const WhereTo = styled.Text`
+font-size: 22px;
+padding-left: 10px;
+padding-vertical: 12px;
+`;
+
+
+const LastTripView = styled.View`
+margin-bottom: 5px;
+flex-direction: row;
+`;
+
+const LastTripIcon = styled.View`
+flex: 1;
+margin-right: 5px;
+
+		   background: #adacac;
+		   border-radius: 44px;
+		   align-items: center;
+		   justify-content: center;
+`;
+
+const LastTrip = styled.View`
+flex: 6;
+`;
+
+const TripLocation = styled.Text`
+font-size: 13px;
+font-weight: bold;
+margin-vertical: 2px;
+`;
+
+const Address = styled.Text`
+font-size: 13px;
+`;
+
+const MarkerView = styled.View`
+
 `;

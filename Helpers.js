@@ -1336,4 +1336,8 @@ export async function decodeDirectionPoints(str)
 		   console.log(`Unknown error: ${error}`);			
 	   });   
 }
+
+export function getFare(){
+	
+}
  

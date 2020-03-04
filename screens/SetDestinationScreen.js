@@ -188,7 +188,7 @@ export default class SetDestinationScreen extends React.Component {
     return (
 	       <BackgroundImage source={require('../assets/images/bg.jpg')}>
 	        <Container>	     
-
+            <ScrollView>
 				   
 					  {this.state.isLoadingComplete ? (
 					 <Row style={{flex: 1, marginTop: 10, width: '100%',backgroundColor: 'rgba(0,0,0,0)'}}>
@@ -229,9 +229,9 @@ export default class SetDestinationScreen extends React.Component {
 				         title="Submit"
                         >
                      <DestinationItemWrapper>
-					   <DestinationLogo>
-					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardDirections)} w={60} h={40}/>
-					   </DestinationLogo>
+					   <DestinationLogoo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardDirections)} w={30} h={30}/>
+					   </DestinationLogoo>
 					   <DestinationDescription>
 					     <DestinationText style={{borderColor: AppStyles.themeColorTransparent,width: '90%'}}>
 					       {this.state.address}
@@ -245,9 +245,9 @@ export default class SetDestinationScreen extends React.Component {
 					
 					
 					 <DestinationItemWrapper>
-					   <DestinationLogo>
-					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardClock)} w={60} h={40}/>
-					   </DestinationLogo>
+					   <DestinationLogoo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardClock)} w={30} h={30}/>
+					   </DestinationLogoo>
 					   <DestinationDescription>
 					     <DestinationText style={{borderColor: AppStyles.themeColorTransparent,width: '90%'}}>
 					      Previous locations will be shown here
@@ -263,7 +263,7 @@ export default class SetDestinationScreen extends React.Component {
                         >
                      <DestinationItemWrapper>
 					   <DestinationLogo>
-					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardMapMarker)} w={60} h={40}/>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardMapMarkerAlt)} w={20} h={20}/>
 					   </DestinationLogo>
 					   <DestinationDescription>
 					     <DestinationText style={{borderColor: AppStyles.themeColorTransparent,width: '90%'}}>
@@ -291,7 +291,7 @@ export default class SetDestinationScreen extends React.Component {
 					  <TestText></TestText>
 					</TestView>
 				   </Row>
-				  		
+		     </ScrollView>		
 			</Container>
 			</BackgroundImage>
     );
@@ -322,8 +322,16 @@ const DestinationItemWrapper = styled.View`
                    flex-direction: row;
 `;
 
+const DestinationLogoo = styled.View`
+ align-items: center;
+				   justify-content: center;
+`;
+ 
 const DestinationLogo = styled.View` 
-                   width: 20%;
+             	   background: rgb(101, 33, 33);
+		   border-radius: 25px;
+		   width: 12%;
+		   height: 70%;
 				   align-items: center;
 				   justify-content: center;
 `;
