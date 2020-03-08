@@ -48,7 +48,11 @@ export default class SetDestinationScreen extends React.Component {
 	                 isLoadingComplete: false,
 					 irrelevant: false,
 					 hasDestination: false,
-					 toAddressBorderColor: "#eee"
+					 toAddressBorderColor: "#eee",
+					 rideType: "me",
+					 rideTypes: [{key: 1,name: "For me", value: "me"},
+	                     {key: 3,name: "For someone else", value: "other"}
+						 ]
 				 };	
 				 
 	this.navv = null;
@@ -154,7 +158,8 @@ export default class SetDestinationScreen extends React.Component {
   
 
   _setDestinationMap = () => {
-			console.log(this.dt);
+							this.dt.rideType = this.state.rideType;
+										console.log(this.dt);
 			this.navv.navigate('SetDestinationMap',{
 		       dt: this.dt
 	        });
@@ -163,6 +168,7 @@ export default class SetDestinationScreen extends React.Component {
   _setDestinationText = async (hasDestination) => {
 			console.log(this.state.toAddress);
 			if(hasDestination){
+				this.dt.rideType = this.state.rideType;
 			 this.dt.destination = {
 		      latlng: this.state.markerCoords,
 		      formattedAddress: this.state.address
@@ -191,12 +197,29 @@ export default class SetDestinationScreen extends React.Component {
             <ScrollView>
 				   
 					  {this.state.isLoadingComplete ? (
-					 <Row style={{flex: 1, marginTop: 10, width: '100%',backgroundColor: 'rgba(0,0,0,0)'}}>
+					 <Row style={{flex: 1, marginTop: 60, width: '100%',backgroundColor: 'rgba(0,0,0,0)'}}>
 					  {this.state.irrelevant ? (
 					  <TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Select destination on map"/>	
 					  ) : (
 					    <>
 					   <ProductInputWrapper>
+					   <RideTypeWrapper>
+                       <RideTypeLogo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUserCircle)} w={20} h={20}/>
+					   </RideTypeLogo>
+					   <RideType
+					     selectedValue={this.state.rideType}
+						mode="dropdown"
+					    onValueChange={(value,index) => {this.setState({rideType: value})}}
+					   >
+					     <RideType.Item key="5" label="Who is this ride for?" value="none"/>
+						{
+							this.state.rideTypes.map((element) => {
+								return <RideType.Item key={"qtype-" + element.key} label={element.name} value={element.value}/>
+								})	
+						}
+					   </RideType>
+					   </RideTypeWrapper>
 				    <ProductText style={{borderColor: AppStyles.themeColorTransparent,width: '90%'}}>
 					  {this.dt.origin.formattedAddress}
 					</ProductText>
@@ -219,7 +242,7 @@ export default class SetDestinationScreen extends React.Component {
 					</ProductInputWrapper>
 					
 					
-					<HR color={AppStyles.themeColor}/>
+					<HR color={AppStyles.themeColorTransparent}/>
 					
 					 <ProductInputWrapper style={{width: '100%', marginLeft: -5}}>
 					 {this.state.hasDestination ? (
@@ -239,7 +262,7 @@ export default class SetDestinationScreen extends React.Component {
 					   </DestinationDescription>
 					 </DestinationItemWrapper>		
                       </DestinationButton>	
-                      <HR color={AppStyles.themeColor}/>
+                      <HR color={AppStyles.themeColorTransparent}/>
                      </>					  
 					) : (null)}
 					
@@ -255,7 +278,7 @@ export default class SetDestinationScreen extends React.Component {
 					   </DestinationDescription>
 					 </DestinationItemWrapper>		
                    
-                     <HR color={AppStyles.themeColor}/>
+                     <HR color={AppStyles.themeColorTransparent}/>
                      
 					  <DestinationButton
 				         onPress={() => {this._setDestinationMap()}}
@@ -320,6 +343,23 @@ const ProductInputWrapper = styled.View`
 
 const DestinationItemWrapper = styled.View` 
                    flex-direction: row;
+`;
+
+const RideTypeWrapper = styled.View` 
+                   flex-direction: row;
+`;
+
+const RideTypeLogo = styled.View`
+ align-items: center;
+				   justify-content: center;
+				 height: 50;
+`;
+
+const RideType = styled.Picker`
+    width: 80%;
+	height: 50;
+	color: #000;
+	margin-bottom: 20px;
 `;
 
 const DestinationLogoo = styled.View`
@@ -488,3 +528,5 @@ const BottomButton = styled.TouchableOpacity`
     justify-content: center;
     margin-horizontal: 5;
 `;
+
+

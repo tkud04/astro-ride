@@ -167,7 +167,25 @@ export default class SetDestinationMapScreen extends React.Component {
 				   
 					  {this.state.isLoadingComplete ? (
 					 <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
-					  {this.state.hasDestination ? (
+					  
+				     <MapView 
+					   ref={ref => {
+                         this.map = ref;
+                       }}
+                       mapType="standard"
+					   style={{marginBottom: 10,width: Dimensions.get('window').width, height: Dimensions.get('window').height - 100}}
+					   region={this.state.region}
+                       onRegionChange={region => this._handleMapRegionChange(region)}
+					   onPress={e => this._setDestination(e.nativeEvent)}
+   				     >
+				       <Marker
+					      coordinate={this.state.markerCoords}
+						  title="Destination"
+                          description={this.state.address}
+						  draggable={true}
+					   />
+					 </MapView>	
+                    {this.state.hasDestination ? (
 					  <TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Select destination on map"/>	
 					  ) : (
 					    <>
@@ -180,24 +198,6 @@ export default class SetDestinationMapScreen extends React.Component {
 				    </SubmitButton>	
 						</>
 					  )}
-				     <MapView 
-					   ref={ref => {
-                         this.map = ref;
-                       }}
-                       mapType="standard"
-					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 200}}
-					   region={this.state.region}
-                       onRegionChange={region => this._handleMapRegionChange(region)}
-					   onPress={e => this._setDestination(e.nativeEvent)}
-   				     >
-				       <Marker
-					      coordinate={this.state.markerCoords}
-						  title="Destination"
-                          description={this.state.address}
-						  draggable={true}
-					   />
-					 </MapView>	
-                    
 				     
                     </Row>					
 				   ) : (

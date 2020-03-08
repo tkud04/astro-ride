@@ -63,7 +63,7 @@ export default class ConfirmRideScreen extends React.Component {
 	  
   
   _next = async () => {
-	// this.navv.navigate('ConfirmRide'); 
+	// this.navv.navigate('ConfirmRide');  
   }
 
   _init = async () => {
@@ -157,32 +157,7 @@ export default class ConfirmRideScreen extends React.Component {
 				   
 					  {this.state.isLoadingComplete ? (
 					 <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
-						<StatsView>
-						  <RideView>
-						  <LogoView>
-						     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.logoCar)} w={30} h={20}/>
-						  </LogoView>
-                            <RideType>
-							  <AstroTextView>
-							     <AstroText>Astro Go</AstroText>
-							     <PassengersView>
-								    <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUsers)} w={30} h={20}/>
-									<PassengersText>4</PassengersText>
-								 </PassengersView>
-							  </AstroTextView>
-							</RideType>	
-                            <PriceView>
-							  <PriceText>N2050 to N2650</PriceText>
-							</PriceView>							
-						  </RideView>
-						  <PaymentTypeView></PaymentTypeView>
-						</StatsView>
-						<SubmitButton
-				         onPress={() => {this._next()}}
-				         title="Submit"
-                        >
-                        <CButton title="Confirm" background="rgb(101, 33, 33)" color="#fff" />					   
-				    </SubmitButton>	
+						
 				     <MapView 
 					   ref={ref => {
                          this.map = ref;
@@ -216,7 +191,34 @@ export default class ConfirmRideScreen extends React.Component {
 		                 strokeWidth={3}
 	                   />
 					 </MapView>	
-                    
+                    <WWrapper>
+					<StatsView>
+						  <RideView>
+						  <LogoView>
+						     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.logoCar)} w={30} h={20}/>
+						  </LogoView>
+                            <RideType>
+							  <AstroTextView>
+							     <AstroText>Astro Go</AstroText>
+							     <PassengersView>
+								    <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUsers)} w={30} h={20}/>
+									<PassengersText>4</PassengersText>
+								 </PassengersView>
+							  </AstroTextView>
+							</RideType>	
+                            <PriceView>
+							  <PriceText>N2050 to N2650</PriceText>
+							</PriceView>							
+						  </RideView>
+						  <PaymentTypeView></PaymentTypeView>
+						</StatsView>
+						<SubmitButton
+				         onPress={() => {this._next()}}
+				         title="Submit"
+                        >
+                        <CButton title="Confirm" background="rgb(101, 33, 33)" color="#fff" />					   
+				    </SubmitButton>	
+					</WWrapper>
 				     
                     </Row>					
 				   ) : (
@@ -278,6 +280,10 @@ const ProductInput = styled.TextInput`
 					 border-bottom-width: 3;
 `;
 
+
+const WWrapper = styled.View`
+
+`;
 
 const TestButton = styled.Button`
   background-color: blue;

@@ -111,13 +111,13 @@ constructor(props){
 			    <Drawer.Navigator initialRouteName='Dashboard' drawerContent={props => (<CustomDrawerComponent {...props}/>)}>
 				   {this.state.loggedIn ? (
 				   <>
-				    <Drawer.Screen name="Dashboard" component={AppStack} options={{drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>) }}/>
-				    <Drawer.Screen name="Trips" component={TripsStack} options={{drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>) }}/>
-				    <Drawer.Screen name="Payment" component={PaymentStack} options={{drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>) }}/>
-				    <Drawer.Screen name="Sign out" component={SignoutScreen} options={({route}) => ({drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>), headerStyle: {backgroundColor: AppStyles.headerBackground, height: AppStyles.headerHeight}, header: () => <AppHomeHeader xml={AppStyles.svg.chartBar} r = {route} title="AstroRide" subtitle="Dashboard"  sml={40}/>, headerTintColor: AppStyles.headerColor, headerLeft: null})}/>
+				    <Drawer.Screen name="Dashboard" component={AppStack} />
+				    <Drawer.Screen name="Trips" component={TripsStack} />
+				    <Drawer.Screen name="Payment" component={PaymentStack} />
+				    <Drawer.Screen name="Sign out" component={SignoutScreen} options={({route}) => ({headerStyle: {backgroundColor: AppStyles.headerBackground, height: AppStyles.headerHeight}, header: () => <AppHomeHeader xml={AppStyles.svg.chartBar} r = {route} title="AstroRide" subtitle="Dashboard"  sml={40}/>, headerTintColor: AppStyles.headerColor, headerLeft: null})}/>
 					</>
 				   ) : (
-				    <Drawer.Screen name="Sign in" component={AuthStack} options={{drawerIcon: () => (<SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardArea)} w={40} h={20}/>) }}/>
+				    <Drawer.Screen name="Sign in" component={AuthStack} />
 				   )}
            
                 </Drawer.Navigator>
