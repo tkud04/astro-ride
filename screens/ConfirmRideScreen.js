@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState, UseEffect} from 'react';
 import styled from 'styled-components';
 import CButton from '../components/CButton';
 import AppStyles from '../styles/AppStyles';
@@ -9,7 +9,7 @@ import SvgIcon from '../components/SvgIcon';
 import TitleHeader from '../components/TitleHeader';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
-import {ScrollView, Dimensions, ActivityIndicator} from 'react-native';
+import {ScrollView, Dimensions, ActivityIndicator, Animated} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 import { Notifications } from 'expo';
@@ -24,6 +24,9 @@ const LATITUDE = 37.78825;
 const LONGITUDE = -122.4324;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+
+let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 
 export default class ConfirmRideScreen extends React.Component { 
    constructor(props) {
@@ -47,7 +50,11 @@ export default class ConfirmRideScreen extends React.Component {
                      },
 	                 isLoadingComplete: false,
 	                 focusMapLoading: true,
-					 points:[]
+					 points:[],
+					 polylineOpacity: 0.5,
+					 paymentMethod: "cash",
+					 paymentMethods: [{key: 1,name: "Cash", value: "cash"}
+						 ]
 				 };	
 				 
 	this.navv = null;
@@ -55,6 +62,7 @@ export default class ConfirmRideScreen extends React.Component {
 	
 	this._init();
 	this._getDirections();
+	
   }
   
     launchDrawer = () => {
@@ -64,6 +72,21 @@ export default class ConfirmRideScreen extends React.Component {
   
   _next = async () => {
 	// this.navv.navigate('ConfirmRide');  
+	let validationErrors = (this.state.paymentMethod === "none");
+	
+	if(validationErrors){
+		if(this.state.paymentMethod === "none"){
+			 showMessage({
+			 message: "Please select your preferred method",
+			 type: 'danger'
+		 });
+		}
+	}
+	else{
+		this.dt.paymentMethod = this.state.paymentMethod;
+			console.log("dt after confirm: ",this.dt);
+	}
+
   }
 
   _init = async () => {
@@ -135,13 +158,14 @@ export default class ConfirmRideScreen extends React.Component {
    // this.setState({region: mapRegion });
   };
 
-  _next = () => {
-			//console.log("dt: ",this.dt);
-  }
   
   _focusMap = () => {
-	  if(this.map !== null) this.map.fitToSuppliedMarkers(['origin','destination'],{ edgePadding:{top: 50,right: 50, bottom: 50,left: 50}});
+	  if(this.map !== null){
+		  this.map.fitToSuppliedMarkers(['origin','destination'],{ edgePadding:{top: 50,right: 50, bottom: 50,left: 50}});
+		 
+	  } 
   }
+  
   
   render() {
 	 let navv = this.props.navigation;
@@ -185,38 +209,56 @@ export default class ConfirmRideScreen extends React.Component {
 						  draggable={true}
 						  identifier="origin"
 					   />
-					   <Polyline
+					   <AnimatedPolyLine
 		                 coordinates={this.state.points}
-		                 strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider	
+		                 strokeColor={`rgba(0,0,0,${this.state.polylineOpacity})`} // fallback for when `strokeColors` is not supported by the map-provider	
 		                 strokeWidth={3}
 	                   />
 					 </MapView>	
                     <WWrapper>
-					<StatsView>
+					<StatsView style={{backgroundColor: AppStyles.themeColorTransparent,padding: 10, marginBottom: 9, marginLeft: 0}}>
 						  <RideView>
 						  <LogoView>
-						     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.logoCar)} w={30} h={20}/>
+						     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.logoCarWhite)} w={30} h={20}/>
 						  </LogoView>
                             <RideType>
 							  <AstroTextView>
-							     <AstroText>Astro Go</AstroText>
+							     <AstroText style={{color: '#fff'}}>Astro Ride</AstroText>
 							     <PassengersView>
-								    <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUsers)} w={30} h={20}/>
-									<PassengersText>4</PassengersText>
+								    <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUsersWhite)} w={30} h={15}/>
+									<PassengersText style={{color: '#fff', marginLeft: 0}}>4</PassengersText>
 								 </PassengersView>
 							  </AstroTextView>
 							</RideType>	
                             <PriceView>
-							  <PriceText>N2050 to N2650</PriceText>
+							  <PriceText style={{color: '#fff'}}>N2050 to N2650</PriceText>
 							</PriceView>							
 						  </RideView>
-						  <PaymentTypeView></PaymentTypeView>
+						 </StatsView>
+						 <StatsView>
+						 <PaymentMethodWrapper>
+                       <PaymentMethodLogo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUserCircle)} w={20} h={20}/>
+					   </PaymentMethodLogo>
+						  <PaymentMethod
+					     selectedValue={this.state.paymentMethod}
+						mode="dropdown"
+					    onValueChange={(value,index) => {this.setState({paymentMethod: value})}}
+					   >
+					     <PaymentMethod.Item key="5" label="Choose preferred payment method" value="none"/>
+						{
+							this.state.paymentMethods.map((element) => {
+								return <PaymentMethod.Item key={"ptype-" + element.key} label={element.name} value={element.value}/>
+								})	
+						}
+					   </PaymentMethod>
+					   </PaymentMethodWrapper>
 						</StatsView>
 						<SubmitButton
 				         onPress={() => {this._next()}}
 				         title="Submit"
                         >
-                        <CButton title="Confirm" background="rgb(101, 33, 33)" color="#fff" />					   
+                        <CButton title="CONFIRM RIDE" background="rgb(101, 33, 33)" color="#fff" />					   
 				    </SubmitButton>	
 					</WWrapper>
 				     
@@ -444,7 +486,7 @@ const PriceView = styled.View`
 `;
 
 const PriceText = styled.Text`
-   font-size: 10px;
+   font-size: 12px;
    font-weight: bold;
    color: rgb(101, 33, 33);
 `;
@@ -455,4 +497,20 @@ const LogoView = styled.View`
    margin-left: 10;
 `;
 
+const PaymentMethodWrapper = styled.View` 
+                   flex-direction: row;
+`;
+
+const PaymentMethodLogo = styled.View`
+ align-items: center;
+				   justify-content: center;
+				 height: 20;
+`;
+
+const PaymentMethod = styled.Picker`
+    width: 80%;
+	height: 20;
+	color: #000;
+	margin-bottom: 20px;
+`;
 
