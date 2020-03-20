@@ -70,36 +70,6 @@ let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 	  } 
   }
   
-  const _getDirections = async () => {
-	  //console.log("dt: ",dt);
-	 let ret = {
-		 from:{
-			 latitude: dt.origin.latlng.latitude,
-			 longitude: dt.origin.latlng.longitude,
-		 },
-		 to:{
-			 latitude: dt.destination.latlng.latitude,
-			 longitude: dt.destination.latlng.longitude,
-		 }
-	 }
-	 
-	 let directions = await helpers.getDirections(ret);
-	 //console.log("directions: ",directions);
-	 
-	 if(directions.routes.length > 0){
-		 let overlayPoints = directions.routes[0].overview_polyline.points;
-		 let ppoints = await helpers.decodeDirectionPoints(overlayPoints);
-		 let rr = [];
-
-		 for(let i = 0; i < ppoints.length;i++){
-			 let p = ppoints[i];
-			 rr.push({latitude: p[0],longitude: p[1]});
-		 }
-		  //console.log("Points: ",rr);
-		  setPoints(rr);
-	 }
-   // this.setState({region: mapRegion });
-  };
   
   const _launchDrawer = () => {
 	navv.toggleDrawer();  
@@ -151,6 +121,39 @@ const ConfirmRideScreen = (props) =>  {
     
 	
     useEffect(() => {
+		
+		  const _getDirections = async () => {
+	  //console.log("dt: ",dt);
+	 let ret = {
+		 from:{
+			 latitude: dt.origin.latlng.latitude,
+			 longitude: dt.origin.latlng.longitude,
+		 },
+		 to:{
+			 latitude: dt.destination.latlng.latitude,
+			 longitude: dt.destination.latlng.longitude,
+		 }
+	 }
+	 
+	 let directions = await helpers.getDirections(ret);
+	 //console.log("directions: ",directions);
+	 
+	 if(directions.routes.length > 0){
+		 let overlayPoints = directions.routes[0].overview_polyline.points;
+		 let ppoints = await helpers.decodeDirectionPoints(overlayPoints);
+		 let rr = [];
+
+		 for(let i = 0; i < ppoints.length;i++){
+			 let p = ppoints[i];
+			 rr.push({latitude: p[0],longitude: p[1]});
+		 }
+		  //console.log("Points: ",rr);
+		  setPoints(rr);
+	 }
+   // this.setState({region: mapRegion });
+  };
+		
+		
       		console.log("effect running");
 			 props.navigation.setParams({launchDrawer: _launchDrawer});
 
@@ -251,6 +254,7 @@ const ConfirmRideScreen = (props) =>  {
 						  <PaymentMethod
 					     selectedValue={paymentMethod}
 						mode="dropdown"
+						onValueChange={(value,index) => {setPaymentMethod(value)}}
 					   >
 					     <PaymentMethod.Item key="5" label="Choose preferred payment method" value="none"/>
 						{
@@ -262,7 +266,7 @@ const ConfirmRideScreen = (props) =>  {
 					   </PaymentMethodWrapper>
 						</StatsView>
 						<SubmitButton
-				         onPress={() => {_next(user)}}
+				         onPress={() => {_next([user,paymentMethod])}}
 				         title="Submit"
                         >
                         <CButton title="CONFIRM RIDE" background="rgb(101, 33, 33)" color="#fff" />					   
