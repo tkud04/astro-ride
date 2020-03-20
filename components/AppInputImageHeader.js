@@ -24,7 +24,9 @@ return (
 		  <HeaderMenuButton xml={AppStyles.svg.headerBack} w={30} h={30} ss={{marginLeft: 10, alignSelf: 'flex-start'}}/>
 		</MenuButton>
 	<SvgView>
-     <SvgIcon xml={helpers.insertAppStyle(props.xml)} w={60} h={40}/>
+    {
+		props.xml && <SvgIcon xml={helpers.insertAppStyle(props.xml)} w={60} h={40}/>
+	}
 	   <Title style={{fontSize: 12}}>{props.title}</Title>
   </SvgView>
   </ButtonsView>

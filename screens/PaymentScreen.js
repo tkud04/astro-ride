@@ -6,6 +6,8 @@ import * as helpers from '../Helpers';
 import MapView,{Marker} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import TitleHeader from '../components/TitleHeader';
+import HR from '../components/HR';
+import SvgIcon from '../components/SvgIcon';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import {ScrollView, Dimensions} from 'react-native';
@@ -24,16 +26,10 @@ export default class PaymentScreen extends React.Component {
 	
 	
     this.state = { 
-                   	 mapRegion: null,
-                     hasLocationPermissions: false,
-                     locationResult: null,
-                     markerCoords: {latitude: 0,longitude: 0},
 				 };	
 				 
 	this.navv = null;
     
-	
-	this._getLocationAsync();
   }
   
     launchDrawer = () => {
@@ -41,115 +37,103 @@ export default class PaymentScreen extends React.Component {
   }
 	  
   
-  _testt = async () => {
-	  const { status } = await Location.requestPermissionsAsync();
-    if (status === 'granted') {
-      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.Balanced,
-      });
-    }
-  }
-  
-  _test = () => {
-	  this.navv.navigate('DisplayLatLng'); 
-  }
-
-  _getLocationAsync = async () => {
-	  const { status } = await Location.requestPermissionsAsync();
-    if (status === 'granted') {
-      this.setState({ hasLocationPermissions: true });
-
-      let location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.Highest});
-      this.setState({ locationResult: JSON.stringify(location) });
-      this.setState({ markerCoords: {
-		     latitude: location.coords.latitude,
-		     longitude: location.coords.longitude
-		    }
-			});
-	  
-      // Center the map on the location we just fetched.
-      this.setState({
-        mapRegion: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        },
-      });
-    }
-	else{
-		showMessage({
-			 message: "Locations permissions not granted",
-			 type: 'warning'
-		 });
-	}
-  }
-  
-  _handleMapRegionChange = mapRegion => {
-    //this.setState({ mapRegion });
-  };
   
   _continue = () => {
 	 //form validation
 	  
-  let validationErrors = (this.state.fname.length < 4 || this.state.lname.length < 4 || this.state.gender === "none");
-	  if(validationErrors){
+ 
 	 
-	 if(this.state.fname.length < 4){
-		 showMessage({
-			 message: "Your first name is required",
-			 type: 'danger'
-		 });
-	 }
-	 if(this.state.lname.length < 4){
-		 showMessage({
-			 message: "Your first name is required",
-			 type: 'danger'
-		 });
-	 }
-	 
-	 if(this.state.gender === "none"){
-		 showMessage({
-			 message: "Gender is required",
-			 type: 'danger'
-		 });
-	 } 
-	 
-	}
-	
-	else{
-	  this.dt.fname = this.state.fname;
-	  this.dt.lname = this.state.lname;	  
-	  this.dt.gender = this.state.gender;	  
-	 
-		this.navv.navigate('AddLogin',{
-		   dt: this.dt
-	    });
-	}
-	 
+  }
+
+  _addPaymentMethod = () => {
+	 this.navv.navigate('CashPayment',{
+		       dt: {}
+	        });
   }
   
   render() {
 	 let navv = this.props.navigation;
 	  this.navv = navv;
-	  if(this.state.mapRegion !== null){
-			console.log("current coords: ",this.state.markerCoords);
-		  
-	  }
     return (
+	<ScrollView>
 	       <BackgroundImage source={require('../assets/images/bg.jpg')}>
+		   
 	        <Container>	     
 
-				   <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
+				   <Row style={{flex: 1, marginTop: 15, width: '100%'}}>
 				   <PaymentTypeView>
-				     <PaymentType>CASH</PaymentType>
+				     <PaymentType>Payment methods</PaymentType>
 				   </PaymentTypeView>
 				    <ProductInputWrapper>
-					  <ProductDescription>Your driver will show you the fare at the end of the trip.</ProductDescription>
+					 <PaymentTypeWrapper>
+					   <PaymentTypeLogo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardMoney)} w={50} h={30}/>
+					   </PaymentTypeLogo>
+					   <ProductDescription style={{marginLeft: 15}}>Cash</ProductDescription>
+					  </PaymentTypeWrapper>
+					  <PaymentButton
+					   onPress={() => {this._addPaymentMethod()}}
+					  >
+					  <PaymentActionText>Add Payment Method</PaymentActionText>
+					  </PaymentButton>
+					</ProductInputWrapper>
+                    </Row>	
+                    <HR color={AppStyles.themeColorTransparent}/>	
+					<Row style={{flex: 1, marginTop: 5, width: '100%'}}>
+				   <PaymentTypeView>
+				     <PaymentType>Ride Profiles</PaymentType>
+				   </PaymentTypeView>
+				    <ProductInputWrapper>
+					 <PaymentTypeWrapper>
+					   <PaymentTypeLogo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardUserCircle)} w={50} h={30}/>
+					   </PaymentTypeLogo>
+					   <ProductDescription style={{marginLeft: 15}}>Personal</ProductDescription>
+					  </PaymentTypeWrapper>
+					  <PaymentButton
+					   onPress={() => {this._continue()}}
+					  >
+					  <PaymentActionText>Add Payment Method</PaymentActionText>
+					  </PaymentButton>
+					</ProductInputWrapper>
+                    </Row>	
+                    <HR color={AppStyles.themeColorTransparent}/>	
+                    <Row style={{flex: 1, marginTop: 5, width: '100%'}}>
+				   <PaymentTypeView>
+				     <PaymentType>Promotions</PaymentType>
+				   </PaymentTypeView>
+				    <ProductInputWrapper>
+					  <PaymentButton
+					   onPress={() => {this._continue()}}
+					  >
+					  <PaymentActionText>Add Promo Code</PaymentActionText>
+					  </PaymentButton>
+					</ProductInputWrapper>
+                    </Row>	
+                    <HR color={AppStyles.themeColorTransparent}/>	
+					<Row style={{flex: 1, marginTop: 5, width: '100%'}}>
+				   <PaymentTypeView>
+				     <PaymentType>Vouchers</PaymentType>
+				   </PaymentTypeView>
+				    <ProductInputWrapper>
+					 <PaymentTypeWrapper>
+					   <PaymentTypeLogo>
+					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardGift)} w={50} h={30}/>
+					   </PaymentTypeLogo>
+					   <PaymentButton
+					   onPress={() => {this._continue()}}
+					  >
+					  <PaymentActionText style={{marginLeft: 10}}>Vouchers</PaymentActionText>
+					  </PaymentButton>
+					  </PaymentTypeWrapper>
+					  
 					</ProductInputWrapper>
                     </Row>					
+          				
 			</Container>
+	
 			</BackgroundImage>
+				</ScrollView>	
     );
   }
   
@@ -175,112 +159,45 @@ const ProductDescription = styled.Text`
                    color: #000;
 				   margin-top: 12px;
 				   margin-bottom: 2px;
-				   font-size: 24px;
+				   font-size: 15px;
 				   
 `;
 					 
-const ProductInput = styled.TextInput`
-					 align-items: center;
-					 border: 1px solid #bbb;
-					 padding: 10px;
-					 margin-top: 5px;
-					 margin-bottom: 20px;
-					 color: #000;
-					 border-left-width: 0;
-					 border-top-width: 0;
-					 border-right-width: 0;
-					 border-bottom-width: 3;
-`;
-
-
-const TestButton = styled.Button`
-  background-color: blue;
-  color: #fff;
-  border-radius: 5;
-  margin-top: 40px;
-`;
-
-const SubmitButton = styled.TouchableOpacity`
-
-`;
-
-const ImageUpload = styled.TouchableOpacity`
-
-`;
-
-const ContactUpload = styled.TouchableOpacity`
-
-`;
-
-const ContactView = styled.View`
-
-`;
-
-const ContactText = styled.Text` 
-                   color: #fff;
-				   background-color: green;
-				   margin-bottom: 6px;
-				   font-size: 16px;
-				   padding: 8px;
-`;
-					 
-const Logo = styled.Image`
-           width: 66px;
-		   height: 66px;
-		   background: black;
-		   border-radius: 33px;
-		   margin-left: 8px;
-`;
 
 const Row = styled.View`
    margin: 5px;
    width: 100%;
 `;
 
-const TopRightInputs = styled.View`
-   margin-left: 10px;
-   margin-right: 5px;
-   width: 60%;
-`;
-
-const CustomerSelect = styled.Picker`
-    width: 90%;
-	height: 50;
-	color: #000;
-	margin-bottom: 20px;
-`;
-
-const BottomInputs = styled.View`
-   margin-top: 10px;
-   margin-left: 10px;
-   margin-bottom: 10px;
-   width: 90%;
-`;
-
-const NoteView = styled.View`
-
-`;
-
-const TestView = styled.View`
-
-`;
-
-const TestText = styled.Text` 
-                   color: rgb(101, 33, 33);
-				   margin-bottom: 6px;
-				   font-size: 16px;
-				   padding: 8px;
-`;
-
 const PaymentTypeView = styled.View`
-  background: rgb(101, 33, 33);
-  align-items: center;
-  margin-bottom: 10px;
-  justify-content: center;
+  margin-top: 10px;
+  margin-left: 5px;
 `;
 
 const PaymentType = styled.Text`
-  color: white;
-  font-size: 26;
+  color: #777;
+  font-size: 17;
+  font-weight: bold;
   margin-bottom: 15;
+`;
+
+const PaymentActionText = styled.Text`
+                   color: #00e;
+				   margin-top: 12px;
+				   margin-bottom: 2px;
+				   font-size: 15px;
+`;
+
+const PaymentButton = styled.TouchableOpacity`
+
+`;
+
+const PaymentTypeLogo = styled.View`
+height: 50;
+align-items: center;
+justify-content: center;
+`;
+
+const PaymentTypeWrapper = styled.View`
+flex-direction: row;
 `;

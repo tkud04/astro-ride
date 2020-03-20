@@ -1,4 +1,4 @@
-import React,{useState, useEffect, useCallback, useRef} from 'react';
+import React,{useState, UseEffect, useRef} from 'react';
 import styled from 'styled-components';
 import CButton from '../components/CButton';
 import AppStyles from '../styles/AppStyles';
@@ -28,18 +28,61 @@ const LONGITUDE = -122.4324;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-let dt = null, navv = null, map = null, viewShot = null;
+
 let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 
-
-
-
- const _next = async (user) => {
+export default class ConfirmRideScreen extends React.Component { 
+   constructor(props) {
+    super(props);
+	this.props.navigation.setParams({launchDrawer: this.launchDrawer});	
+	this.dt = props.route.params.dt;
+	helpers._getPermissionAsync('camera roll');
+	
+    this.state = { 
+                     hasLocationPermissions: false,
+                     locationResult: null,
+					 fromAddress: "",
+                     fromMarkerCoords: {latitude: 0,longitude: 0},
+					 toAddress: "",
+                     toMarkerCoords: {latitude: 0,longitude: 0},
+					 region: {
+                       latitude: LATITUDE,
+                       longitude: LONGITUDE,
+                       latitudeDelta: LATITUDE_DELTA,
+                       longitudeDelta: LONGITUDE_DELTA,
+                     },
+	                 isLoadingComplete: false,
+	                 focusMapLoading: true,
+					 points:[],
+					 polylineOpacity: 0.5,
+					 paymentMethod: "cash",
+					 paymentMethods: [{key: 1,name: "Cash", value: "cash"}
+						 ],
+					cameraRollUri: null,
+					isMapReady: false
+				 };	
+				 
+	this.navv = null;
+    this.map = null;
+	this.viewShot = useRef();
+	
+	this._init();
+	this._getDirections();
+	
+	
+  }
+  
+    launchDrawer = () => {
+	this.navv.toggleDrawer();  
+  }
+	  
+  
+  _next = async (user) => {
 	// this.navv.navigate('ConfirmRide');  
-	let validationErrors = (paymentMethod === "none");
+	let validationErrors = (this.state.paymentMethod === "none");
 	
 	if(validationErrors){
-		if(paymentMethod === "none"){
+		if(this.state.paymentMethod === "none"){
 			 showMessage({
 			 message: "Please select your preferred method",
 			 type: 'danger'
@@ -47,39 +90,59 @@ let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 		}
 	}
 	else{
-		dt.paymentMethod = paymentMethod;
-		dt.u = user;
+		this.dt.paymentMethod = this.state.paymentMethod;
+		this.dt.u = user;
 		
-	_takeSnapshot();
-	helpers.confirmRide(dt);
+	this._takeSnapshot();
+	helpers.confirmRide(this.dt);
 	}
 
   }
 
- 
-
-  _handleMapRegionChange = mapRegion => {
-   // this.setState({region: mapRegion });
-  };
-
-  
-  const _focusMap = () => {
-	  if(map !== null){
-		  map.fitToSuppliedMarkers(['origin','destination'],{ edgePadding:{top: 50,right: 50, bottom: 50,left: 50}});
-		 
-	  } 
+  _init = async () => {
+	  const { status } = await Location.requestPermissionsAsync();
+    if (status === 'granted') {
+      this.setState({ hasLocationPermissions: true });   
+	  this.setState({ fromAddress: this.dt.origin.formattedAddress, toAddress: this.dt.destination.formattedAddress});
+      this.setState({ fromMarkerCoords: {
+		     latitude: this.dt.origin.latlng.latitude,
+		     longitude: this.dt.origin.latlng.longitude
+		    },
+			toMarkerCoords: {
+		     latitude: this.dt.destination.latlng.latitude,
+		     longitude: this.dt.destination.latlng.longitude
+		    }
+			});
+	  
+      // Center the map on the location we just fetched.
+      this.setState({
+        region: {
+          latitude: this.dt.origin.latlng.latitude,
+          longitude: this.dt.origin.latlng.longitude,
+          latitudeDelta: 0.007,
+          longitudeDelta: 0.007,
+        },
+      });
+    }
+	else{
+		showMessage({
+			 message: "Locations permissions not granted",
+			 type: 'warning'
+		 });
+	}
+	this.setState({ isLoadingComplete: true});
   }
   
-  const _getDirections = async () => {
-	  //console.log("dt: ",dt);
+  _getDirections = async () => {
+	  //console.log("this.dt: ",this.dt);
 	 let ret = {
 		 from:{
-			 latitude: dt.origin.latlng.latitude,
-			 longitude: dt.origin.latlng.longitude,
+			 latitude: this.dt.origin.latlng.latitude,
+			 longitude: this.dt.origin.latlng.longitude,
 		 },
 		 to:{
-			 latitude: dt.destination.latlng.latitude,
-			 longitude: dt.destination.latlng.longitude,
+			 latitude: this.dt.destination.latlng.latitude,
+			 longitude: this.dt.destination.latlng.longitude,
 		 }
 	 }
 	 
@@ -88,137 +151,107 @@ let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 	 
 	 if(directions.routes.length > 0){
 		 let overlayPoints = directions.routes[0].overview_polyline.points;
-		 let ppoints = await helpers.decodeDirectionPoints(overlayPoints);
+		 let points = await helpers.decodeDirectionPoints(overlayPoints);
 		 let rr = [];
 
-		 for(let i = 0; i < ppoints.length;i++){
-			 let p = ppoints[i];
+		 for(let i = 0; i < points.length;i++){
+			 let p = points[i];
 			 rr.push({latitude: p[0],longitude: p[1]});
 		 }
 		  //console.log("Points: ",rr);
-		  setPoints(rr);
+		  this.setState({points: rr});
 	 }
    // this.setState({region: mapRegion });
   };
+
+  _handleMapRegionChange = mapRegion => {
+   // this.setState({region: mapRegion });
+  };
+
   
-  const _launchDrawer = () => {
-	navv.toggleDrawer();  
+  _focusMap = () => {
+	  if(this.map !== null){
+		  this.map.fitToSuppliedMarkers(['origin','destination'],{ edgePadding:{top: 50,right: 50, bottom: 50,left: 50}});
+		 
+	  } 
   }
   
+  _saveToCameraRollAsync = async () => {
+    try {
+      let result = await captureRef(this.map, {
+        format: 'png',
+      });
+
+      let saveResult = await CameraRoll.saveToCameraRoll(result, 'photo');
+      console.log(saveResult);
+      this.setState({ cameraRollUri: saveResult });
+    }
+    catch(snapshotError) {
+      console.error(snapshotError);
+    }
+  }
   
-  const _takeSnapshot = () => {
-	if(map.current !== null){
+  _takeSnapshot = () => {
+	if(this.map !== null){
 		  /**
 		  const snapshot = this.map.takeSnapshot({
 			  result: 'base64'
 		  });
 		  **/
-		  const snapshot = viewShot.current.capture();
-		  snapshot.then((uri) => {dt.snapshot = uri});
+		  const snapshot = this.viewShot.capture();
+		  snapshot.then((uri) => {this.dt.snapshot = uri});
 		 
 	  }   
   }
   
-
-const ConfirmRideScreen = (props) =>  { 
-   
-	dt = props.route.params.dt;
-	navv = props.navigation;
-	viewShot = useRef();
-	
-	
-	const [hasLocationPermissions, setHasLocationPermissions] = useState(false);
-	const [locationResult, setLocationResult] = useState(null);
-	const [fromAddress, setFromAddress] = useState("");
-	const [fromMarkerCoords, setFromMarkerCoords] = useState({latitude: 0,longitude: 0});
-	const [toAddress, setToAddress] = useState("");
-	const [toMarkerCoords, setToMarkerCoords] = useState({latitude: 0,longitude: 0});
-	const [region, setRegion] = useState({latitude: LATITUDE, longitude: LONGITUDE, latitudeDelta: LATITUDE_DELTA,longitudeDelta: LONGITUDE_DELTA});
-	const [isLoadingComplete, setIsLoadingComplete] = useState(false);
-	const [focusMapLoading, setFocusMapLoading] = useState(true);
-	const [points, setPoints] = useState([]);
-	const [polylineOpacity, setPolylineOpacity] = useState(0.5);
-	const [paymentMethod, setPaymentMethod] = useState("cash");
-	const [paymentMethods, setPaymentMethods] = useState([{key: 1,name: "Cash", value: "cash"}]);
-	const [cameraRollUri, setCameraRollUri] = useState(null);
-	const [isMapReady, setIsMapReady] = useState(false);
-	
- 
-	
-	const _updatePaymentMethod = useCallback((value, index) => {
-	   navv.toggleDrawer();  
-       },[]);
-    
-	
-    useEffect(() => {
-      		console.log("effect running");
-			 props.navigation.setParams({launchDrawer: _launchDrawer});
-
-	  setFromAddress(dt.origin.formattedAddress);	  
-      setToAddress(dt.destination.formattedAddress);	  
-	  
-	 
-	  setFromMarkerCoords({
-		     latitude: dt.origin.latlng.latitude,
-		     longitude: dt.origin.latlng.longitude
-		    });
-			
-	  setToMarkerCoords({
-		     latitude: dt.destination.latlng.latitude,
-		     longitude: dt.destination.latlng.longitude
-		    });
-	  
-	  setRegion({
-          latitude: dt.origin.latlng.latitude,
-          longitude: dt.origin.latlng.longitude,
-          latitudeDelta: 0.007,
-          longitudeDelta: 0.007,
-        });
-	  
-	  _getDirections();
-	  
-	setIsLoadingComplete(true);
-	
-   },[isLoadingComplete ]);
-	
+  
+  render() {
+	 let navv = this.props.navigation;
+	  this.navv = navv;
+	  if(this.state.region !== null){
+			//console.log("current coords: ",this.state.markerCoords);
+		  
+	  }
     return (
-	 <UserContext.Consumer> 
+	 <UserContext.Consumer>
    {({user,up,loggedIn}) => (
 	       <BackgroundImage source={require('../assets/images/bg.jpg')}>
 	        <Container>	     
 
 				   
-					  {isLoadingComplete ? (
+					  {this.state.isLoadingComplete ? (
 					 <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
-					 <ViewShot ref={ref => {viewShot = ref}} options={{ format: "png", quality: 0.9, result: "base64" }}>	
+					 <ViewShot ref={ref => {this.viewShot = ref}} options={{ format: "png", quality: 0.9, result: "base64" }}>	
 				     <MapView 
 					   ref={ref => {
-                         map = ref;
-						 _focusMap();
+                         this.map = ref;
+						 this._focusMap();
 						
                        }}
                        mapType="standard"
 					   style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height - 200}}
-					   region={region}
-                       onMapReady={() => {setIsMapReady(true); _focusMap()}}
+					   region={this.state.region}
+                       onRegionChange={region => this._handleMapRegionChange(region)}
+					   //onPress={e => this._setDestination(e.nativeEvent)}
+					    onMapReady={() => {this.setState({isMapReady: true}); this._focusMap()}}
    				     >
 				       <Marker
-					      coordinate={toMarkerCoords}
+					      coordinate={this.state.toMarkerCoords}
 						  title="Destination"
-                          description={toAddress}
+                          description={this.state.toAddress}
 						  draggable={true}
 						  identifier="destination"
 					   />
 					   <Marker
-					      coordinate={fromMarkerCoords}
+					      coordinate={this.state.fromMarkerCoords}
 						  title="Origin"
-                          description={fromAddress}
+                          description={this.state.fromAddress}
 						  draggable={true}
 						  identifier="origin"
 					   />
 					   <AnimatedPolyLine
-		                 coordinates={points}
-		                 strokeColor={`rgba(0,0,0,${polylineOpacity})`} // fallback for when `strokeColors` is not supported by the map-provider	
+		                 coordinates={this.state.points}
+		                 strokeColor={`rgba(0,0,0,${this.state.polylineOpacity})`} // fallback for when `strokeColors` is not supported by the map-provider	
 		                 strokeWidth={3}
 	                   />
 					 </MapView>	
@@ -249,12 +282,13 @@ const ConfirmRideScreen = (props) =>  {
 					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardMoney)} w={20} h={20}/>
 					   </PaymentMethodLogo>
 						  <PaymentMethod
-					     selectedValue={paymentMethod}
+					     selectedValue={this.state.paymentMethod}
 						mode="dropdown"
+					    onValueChange={(value,index) => {this.setState({paymentMethod: value})}}
 					   >
 					     <PaymentMethod.Item key="5" label="Choose preferred payment method" value="none"/>
 						{
-							paymentMethods.map((element) => {
+							this.state.paymentMethods.map((element) => {
 								return <PaymentMethod.Item key={"ptype-" + element.key} label={element.name} value={element.value}/>
 								})	
 						}
@@ -262,7 +296,7 @@ const ConfirmRideScreen = (props) =>  {
 					   </PaymentMethodWrapper>
 						</StatsView>
 						<SubmitButton
-				         onPress={() => {_next(user)}}
+				         onPress={() => {this._next(user)}}
 				         title="Submit"
                         >
                         <CButton title="CONFIRM RIDE" background="rgb(101, 33, 33)" color="#fff" />					   
@@ -280,9 +314,9 @@ const ConfirmRideScreen = (props) =>  {
 					  )}
 				    <Row>
 				    <TestView>
-					 {cameraRollUri &&
+					 {this.state.cameraRollUri &&
                       <Image
-                        source={{ uri: cameraRollUri }}
+                        source={{ uri: this.state.cameraRollUri }}
                         style={{ width: 300, height: 200 }}
                         resizeMode="contain"
                       />}
@@ -293,14 +327,14 @@ const ConfirmRideScreen = (props) =>  {
 			</BackgroundImage>
 		 )}
    </UserContext.Consumer>
-    );  
-
+    );
+  }
+  
 }
 
-export default ConfirmRideScreen;
-  
-  
-  const BackgroundImage = styled.ImageBackground`
+
+
+const BackgroundImage = styled.ImageBackground`
            width: 100%;
 		   height: 100%;
 `;
@@ -527,5 +561,4 @@ const PaymentMethod = styled.Picker`
 	color: #000;
 	margin-bottom: 20px;
 `;
-
 

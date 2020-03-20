@@ -11,7 +11,6 @@ import ProfileScreen from '../screens/ProfileScreen';
 import SetDestinationScreen from '../screens/SetDestinationScreen';
 import SetDestinationMapScreen from '../screens/SetDestinationMapScreen';
 import ConfirmRideScreen from '../screens/ConfirmRideScreen';
-import AccountSettingsScreen from '../screens/AccountSettingsScreen';
 
 
 /////////////////////////////////////////////////
@@ -61,35 +60,6 @@ let AppStack = () => (
 					  headerTransparent: true,
 				
 	             header: () => <AppTransparentInputHeader xml={AppStyles.svg.headerPhone}  leftParam = "goBack"  r = {route} title="AstroRide" subtitle="Confirm ride"  sml={40}/>,
-	             headerTintColor: AppStyles.headerColor,
-	             headerLeft: null  
-				  })}
-	              
-                /> 		
-				<Stack.Screen
-                  name="Profile"
-	              component={ProfileScreen}
-				  options={({route}) => ({
-					headerStyle: {
-		            backgroundColor: AppStyles.headerBackground,
-		            height: AppStyles.headerHeight - 200
-	              },
-	             header: () => <AppInputImageHeader r = {route} title="AstroRide" subtitle="Account" sml={10}/>,
-	             headerTintColor: AppStyles.headerColor,
-	             headerLeft: null  
-				  })}
-	              
-                /> 		
-				
-				<Stack.Screen
-                  name="AccountSettings"
-	              component={AccountSettingsScreen}
-				  options={({route}) => ({
-					headerStyle: {
-		            backgroundColor: AppStyles.headerBackground,
-		            height: AppStyles.headerHeight - 200
-	              },
-	             header: () => <AppInputImageHeader r = {route} title="AstroRide" subtitle="Account Settings" sml={10}/>,
 	             headerTintColor: AppStyles.headerColor,
 	             headerLeft: null  
 				  })}

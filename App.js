@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import * as helpers from './Helpers';
 import { NavigationContainer } from '@react-navigation/native';
+import { navigationRef } from './RootNavigation';
 import AppStyles from './styles/AppStyles';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomDrawerComponent from './components/CustomDrawerComponent';
@@ -16,6 +17,7 @@ import AppStack from './navigation/AppStack';
 import TripsStack from './navigation/TripsStack';
 import PaymentStack from './navigation/PaymentStack';
 import AuthStack from './navigation/AuthStack';
+import SignoutStack from './navigation/SignoutStack';
 import AppHomeHeader from './components/AppHomeHeader';
 import SvgIcon from './components/SvgIcon';
 import SignoutScreen from './screens/SignoutScreen';
@@ -25,6 +27,7 @@ import { Notifications } from 'expo';
 import * as TaskManager from 'expo-task-manager';
 import FlashMessage from 'react-native-flash-message';
 import {ThemeContext,UserContext} from './MyContexts.js';
+
 
 
 const LOCATION_TASK_NAME = 'background-location-task';
@@ -68,6 +71,7 @@ constructor(props){
   
 	
   //this.resolve(this.hu);
+  this.navv = null;
 }
   
   _notificationSubscription = null;
@@ -85,11 +89,12 @@ constructor(props){
     let tttk  = (u[1] === "test") ? "testTTK" : uuser.tk;
 	let lloggedIn = (tttk !== null);
 	this.setState({user: uuser,tk: tttk,loggedIn: lloggedIn});
-	console.log("user context updated with ",[uuser,lloggedIn]);
+	//console.log("user context updated with ",[uuser,lloggedIn]);
   };
 
   render() {
-   
+   this.navv = this.props.navigation;
+   //console.log("navv from App.js: ",this.navv);
     if (!this.state.isRealLoadingComplete && !this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
       return (
         <AppLoading
@@ -107,17 +112,17 @@ constructor(props){
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
 		  <ThemeContext.Provider>
 		     <UserContext.Provider value={this.state}>			
-		       <NavigationContainer>
+		       <NavigationContainer ref={navigationRef}>
 			    <Drawer.Navigator initialRouteName='Dashboard' drawerContent={props => (<CustomDrawerComponent {...props}/>)}>
 				   {this.state.loggedIn ? (
 				   <>
 				    <Drawer.Screen name="Dashboard" component={AppStack} />
 				    <Drawer.Screen name="Trips" component={TripsStack} />
 				    <Drawer.Screen name="Payment" component={PaymentStack} />
-				    <Drawer.Screen name="Sign out" component={SignoutScreen} options={({route}) => ({headerStyle: {backgroundColor: AppStyles.headerBackground, height: AppStyles.headerHeight}, header: () => <AppHomeHeader xml={AppStyles.svg.chartBar} r = {route} title="AstroRide" subtitle="Dashboard"  sml={40}/>, headerTintColor: AppStyles.headerColor, headerLeft: null})}/>
+				    <Drawer.Screen name="Sign out" component={SignoutStack}/>
 					</>
 				   ) : (
-				    <Drawer.Screen name="Sign in" component={AuthStack} />
+				    <Drawer.Screen name="Sign in" component={SignoutStack} />
 				   )}
            
                 </Drawer.Navigator>

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import AppStyles from '../styles/AppStyles';
 import SvgIcon from './SvgIcon';
 import * as helpers from '../Helpers';
-import {useNavigation} from '@react-navigation/native';
+import * as RootNavigation from '../RootNavigation.js';
 import {
   DrawerContentScrollView,
   DrawerItemList,
@@ -28,7 +28,7 @@ _getEmail = (u) =>{
 
 _goToProfile = (u) =>{
 	console.log("u: ", u);
-	//n.navigate('Profile', { user: u });
+	RootNavigation.navigate('Profile', { u: u });
 }
 const ripple = TouchableNativeFeedback.Ripple('#adacac', false);
 const CustomDrawerComponent = props => {

@@ -22,8 +22,10 @@ return (
 		  <HeaderMenuButton xml={AppStyles.svg.headerHamburger} w={30} h={30} ss={{marginTop: 10, marginLeft: 20, alignSelf: 'flex-start'}}/>
 		</MenuButton>
 	<SvgView>
-     <SvgIcon xml={helpers.insertAppStyle(props.xml)} w={40} h={40}/>
-	   <Title style={{fontSize: 12}}>{props.title}</Title>
+	{
+		props.xml && <SvgIcon xml={helpers.insertAppStyle(props.xml)} w={40} h={40}/>
+	}
+	<Title style={{fontSize: 12}}>{props.title}</Title>
   </SvgView>
   </ButtonsView>
   

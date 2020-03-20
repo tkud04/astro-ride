@@ -12,14 +12,13 @@ import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import {ScrollView, Dimensions} from 'react-native';
-import * as RootNavigation from '../RootNavigation.js';
 import {ThemeContext,UserContext} from '../MyContexts';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 import { Notifications } from 'expo';
 
 
-export default class ProfileScreen extends React.Component { 
+export default class AccountSettingsScreen extends React.Component { 
    constructor(props) {
     super(props);
 	helpers._getPermissionAsync('camera roll');
@@ -30,12 +29,13 @@ export default class ProfileScreen extends React.Component {
     this.state = { 
                     fnameBorderBottomColor: '#000',
                     emailBorderBottomColor: '#000',
-                    lnameBorderBottomColor: '#000',
+                    nameBorderBottomColor: '#000',
                     phoneBorderBottomColor: '#000',
                     passwordBorderBottomColor: '#000',
                     confirmPasswordBorderBottomColor: '#000',
 					fname: "",
 					lname: "",
+					name: "",
 					email: "",
 					phone: "",
 					password: "",
@@ -71,6 +71,7 @@ export default class ProfileScreen extends React.Component {
 	  
 	    updateState = (dt) => {
 			 console.log("user: ",dt);
+			  this.state.name = `${dt.fname} ${dt.lname}`;
 			  this.state.fname = dt.fname;
 			  this.state.lname = dt.lname;
 			  this.state.email = dt.email;
@@ -100,6 +101,8 @@ export default class ProfileScreen extends React.Component {
 	  
 	  //save img here
   }
+  
+
   
   
  	 _update = () => {
@@ -173,7 +176,9 @@ export default class ProfileScreen extends React.Component {
   }
 
   _goToAccountSettings = (u) => {
-	 RootNavigation.navigate('AccountSettings', { u: u });
+	  this.navv.navigate('AccountSettings',{
+		       u: u
+	        });
   }
   
   render() {
@@ -190,72 +195,132 @@ export default class ProfileScreen extends React.Component {
 	     <ScrollView>
 	        <Container>
 			   <Row style={{flex: 1, marginTop: 15, width: '100%'}}>
-			    <AccountButton
-				    onPress={() => this._goToAccountSettings(user)}
-				   >
-			     <ImageRow style={{flexDirection: 'row', alignItems: 'center'}}>
-                  				
+			     <ImageRow style={{ alignItems: 'center'}}>
+                   <ImageUpload
+				     onPress={() => this.addImage()}
+				   >					
 				   <Logo source={{uri: "data:image/png;base64," + this.state.img}}/>			   
+				   </ImageUpload>
+
 				   <DescriptionWrapper>
-				     <ProductDescription style={{marginTop: 2, color: '#000'}}>{`${this.state.fname} ${this.state.lname}`}</ProductDescription>
-				     <ProductDescription style={{marginTop: 2, color: '#000'}}>{this.state.phone}</ProductDescription>
+				     <ProductDescription style={{marginTop: 2, color: '#000', fontSize: 11}}>Tap the circle to upload image</ProductDescription>
 				   </DescriptionWrapper>
-				   
 				   </ImageRow>
-				   </AccountButton>
 			     </Row>
 			   <HR color={AppStyles.themeColorTransparent}/>
-			   <Row style={{flex: 1, marginTop: 15, width: '100%', flexDirection: 'column'}}>
-			     <PaymentTypeView>
-				     <PaymentType>Favorites</PaymentType>
+			   <Row style={{flex: 1, marginTop: 15, width: '90%', flexDirection: 'column'}}>
+			   <PaymentTypeView>
+				     <PaymentType>Account Information</PaymentType>
 				   </PaymentTypeView>
-				    <ProductInputWrapper>
-					 <PaymentTypeWrapper>
-					   <PaymentTypeLogo>
-					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardHouse)} w={30} h={20}/>
-					   </PaymentTypeLogo>
-					   <DescriptionWrapper style={{alignItems: 'center', justifyContent: 'center'}}>
-					   <AccountButton
-					    onPress={() => {this._addSavedPlace("home")}}
-					   >
-					   <ProductDescription style={{marginLeft: 15}}>{this.state.homeButtonText}</ProductDescription>
-					   </AccountButton>
-					   </DescriptionWrapper>
-					  </PaymentTypeWrapper>
+			     <ProductInputWrapper>
+					 <ProductDescription>Full Name</ProductDescription>
+				    <ProductInput
+					style={{borderColor: this.state.nameBorderBottomColor}}
+				     placeholder="Name"
+					 value={this.state.name}
+				     onChangeText={text => {
+						this.setState({name: text});
+					 }}
+					 onFocus={() => {
+						 
+						this.setState({nameBorderBottomColor: "#00a2e8"});
+					 }}
+					 onBlur={() => {
+						
+						this.setState({nameBorderBottomColor: "#000"});
+					 }}
+					/>
+					</ProductInputWrapper>
+					
+					<ProductInputWrapper>
+					 <ProductDescription>Email address</ProductDescription>
+				    <ProductInput
+					style={{borderColor: this.state.emailBorderBottomColor}}
+				     placeholder="Email adress"
+					 value={this.state.email}
+				     onChangeText={text => {
+						this.setState({email: text});
+					 }}
+					 onFocus={() => {
+						 
+						this.setState({emailBorderBottomColor: "#00a2e8"});
+					 }}
+					 onBlur={() => {
+						
+						this.setState({emailBorderBottomColor: "#000"});
+					 }}
+					/>
 					</ProductInputWrapper>
 					<ProductInputWrapper>
-					 <PaymentTypeWrapper>
-					   <PaymentTypeLogo>
-					     <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardBriefCase)} w={30} h={20}/>
-					   </PaymentTypeLogo>
-					   <DescriptionWrapper style={{alignItems: 'center', justifyContent: 'center'}}>
-					   <AccountButton
-					    onPress={() => {this._addSavedPlace("work")}}
-					   >
-					   <ProductDescription style={{marginLeft: 15}}>{this.state.workButtonText}</ProductDescription>
-					   </AccountButton>
-					   </DescriptionWrapper>
-					  </PaymentTypeWrapper>
-					  <PaymentButton
-					   onPress={() => {this._addSavedPlace()}}
-					  >
-					  <PaymentActionText>More Saved Places</PaymentActionText>
-					  </PaymentButton>
+					 <ProductDescription>Phone number</ProductDescription>
+				    <ProductInput
+					style={{borderColor: this.state.phoneBorderBottomColor}}
+				     placeholder="Phone number"
+					 value={this.state.phone}
+				     onChangeText={text => {
+						this.setState({phone: text});
+					 }}
+					 onFocus={() => {
+						 
+						this.setState({phoneBorderBottomColor: "#00a2e8"});
+					 }}
+					 onBlur={() => {
+						
+						this.setState({phoneBorderBottomColor: "#000"});
+					 }}
+					/>
 					</ProductInputWrapper>
 			     </Row>
 			   <HR color={AppStyles.themeColorTransparent}/>	
-			   <Row style={{flex: 1, marginTop: 15, width: '100%', flexDirection: 'column'}}>
+			   <Row style={{flex: 1, marginTop: 15, marginBottom: 10, width: '90%', flexDirection: 'column'}}>
 			     <PaymentTypeView>
-				     <PaymentType>Family</PaymentType>
+				     <PaymentType>Change Password</PaymentType>
 				   </PaymentTypeView>
-					<ProductInputWrapper style={{marginBottom: 10}}>
-					  <PaymentButton
-					   onPress={() => {this._addFamily()}}
-					  >
-					  <PaymentActionText>Set up your family</PaymentActionText>
-					   <ProductDescription style={{}}>Pay for your loved ones and get notifications</ProductDescription>
-					  </PaymentButton>
+					<ProductInputWrapper>
+					 <ProductDescription>Password</ProductDescription>
+				    <ProductInput
+					style={{borderColor: this.state.passwordBorderBottomColor}}
+				     placeholder="Password"
+				     onChangeText={text => {
+						this.setState({password: text});
+					 }}
+					 onFocus={() => {
+						 
+						this.setState({passwordBorderBottomColor: "#00a2e8"});
+					 }}
+					 onBlur={() => {
+						
+						this.setState({passwordBorderBottomColor: "#000"});
+					 }}
+					 secureTextEntry={true}
+					/>
 					</ProductInputWrapper>
+					
+					<ProductInputWrapper style={{marginBottom: 5}}>
+					 <ProductDescription>Confirm new password</ProductDescription>
+				    <ProductInput
+					style={{borderColor: this.state.confirmPasswordBorderBottomColor}}
+				     placeholder="Confirm password"
+				     onChangeText={text => {
+						this.setState({confirmPassword: text});
+					 }}
+					 onFocus={() => {
+						 
+						this.setState({confirmPasswordBorderBottomColor: "#00a2e8"});
+					 }}
+					 onBlur={() => {
+						
+						this.setState({confirmPasswordBorderBottomColor: "#000"});
+					 }}
+					 secureTextEntry={true}
+					/>
+					</ProductInputWrapper>
+					<SubmitButton
+				       onPress={() => {this._update()}}
+				       title="Submit"
+                    >
+                        <CButton title="Submit" background="rgb(101, 33, 33)" color="#fff" />					   
+				    </SubmitButton>
 			     </Row>
 			</Container>
 		</ScrollView>	   		    
@@ -285,8 +350,8 @@ const TitleBar = styled.View`
 
 
 const Logo = styled.Image`
-           width: 60px;
-		   height: 60px;
+           width: 80px;
+		   height: 80px;
 		   background: #adacac;
 		   border-radius: 55px;
 `;
