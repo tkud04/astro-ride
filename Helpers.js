@@ -1342,6 +1342,6 @@ export function getFare(){
 } 
  
 export function confirmRide(dt){
-	console.log("dt: ",this.dt);
+	console.log("dt: ",dt);
 }
  

@@ -5,30 +5,21 @@ import * as helpers from '../Helpers';
 import {ScrollView, Dimensions, ActivityIndicator, Animated} from 'react-native';
 import {ThemeContext,UserContext} from '../MyContexts';
 import {showMessage, hideMessage} from 'react-native-flash-message';
-import Svg, { Circle, Rect, Text } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 
 import { Notifications } from 'expo';
 
 const { width, height } = Dimensions.get('window');
- 
-  
-  const _launchDrawer = () => {
-	navv.toggleDrawer();  
-  }
+
   
 
-const TestScreen = (props) =>  { 
-   
-	u = props.route.params.u;
-	navv = props.navigation;
+const LoadingView = (props) =>  { 
 	
 	
 	const [fadeAnim] = useState(new Animated.Value(0));
-	const [isVisible,setIsVisible] = useState(false);
 	
 	
     useEffect(() => {
-		console.log(isVisible);
 	Animated.loop(
 	Animated.sequence([
 	Animated.timing(fadeAnim,{
@@ -42,12 +33,10 @@ const TestScreen = (props) =>  {
 	])
 	).start();
     
-   },[isVisible]);
+   },[]);
    
 	
     return (
-	 <UserContext.Consumer> 
-   {({user,up,loggedIn}) => (
 	        <Container>	     
 					 <Row style={{flex: 1, marginTop: 10, marginLeft: 50,  alignContent: 'center', justifyContent: 'center', width: '100%'}}>
 					   <Animated.View
@@ -59,17 +48,15 @@ const TestScreen = (props) =>  {
                         
                        </Animated.View>
 					   <LoadingTextView>
-					    <LoadingText>Finding nearby drivers</LoadingText>
+					    <LoadingText>{props.loadingText}</LoadingText>
 					   </LoadingTextView>
 					 </Row>
 			</Container>
-		 )}
-   </UserContext.Consumer>
     );  
 
 }
 
-export default TestScreen;
+export default LoadingView;
   
   
   const BackgroundImage = styled.ImageBackground`

@@ -6,6 +6,7 @@ import * as helpers from '../Helpers';
 import MapView,{Marker, Polyline} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import SvgIcon from '../components/SvgIcon';
+import LoadingView from '../components/LoadingView';
 import TitleHeader from '../components/TitleHeader';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
@@ -34,21 +35,26 @@ let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 
 
 
- const _next = async (user,paymentMethod,n) => {
+ const _next = async (arr) => {
+	 //user,pm,n/
+	 let u = arr[0], pm = arr[1], n = arr[2]; 
 	// this.navv.navigate('ConfirmRide');  
-	let validationErrors = (paymentMethod === "none");
+	let validationErrors = (pm === "none");
 	
 	if(validationErrors){
-		if(paymentMethod === "none"){
+		if(pm === "none"){
 			 showMessage({
-			 message: "Please select your preferred method",
+			 message: "Please select your payment method",
 			 type: 'danger'
 		 });
 		}
 	}
 	else{
-		dt.paymentMethod = paymentMethod;
-		dt.u = user;
+		console.log("dt: ",dt);
+		dt.paymentMethod = pm;
+		dt.u = u;
+		
+	//show LoadingView
 		
 	//_takeSnapshot();
 	helpers.confirmRide(dt);
@@ -154,6 +160,7 @@ const ConfirmRideScreen = (props) =>  {
 		  setPoints(rr);
 	 }
    // this.setState({region: mapRegion });
+   setIsLoadingComplete(true);
   };
 		
 		
@@ -182,17 +189,9 @@ const ConfirmRideScreen = (props) =>  {
         });
 	  
 	  _getDirections();
-	  
-	setIsLoadingComplete(true);
 	
    },[isLoadingComplete ]);
-   
-   useEffect(() => {
-	  fadeInterval.current = setInterval(() => {
-		  if(fadeAnim >= 1) clearInterval(fadeInterval.current);
-		  else setFadeAnim(fadeAnim + 0.1);
-	  },1000);
-   },[]);
+  
 	
     return (
 	 <UserContext.Consumer> 
@@ -288,12 +287,9 @@ const ConfirmRideScreen = (props) =>  {
 				     
                     </Row>						
 				   ) : (
-				       <Row style={{flex: 1, marginTop: 10, flexDirection: 'row', width: '100%'}}>
-					    <NoteView>
-						  <Note>Loading..</Note>
-						  <ActivityIndicator size="small" color="#0000ff" />
-						</NoteView>					   
-				       </Row>
+				       <Row style={{flex: 1, marginTop: 10,  alignContent: 'center', justifyContent: 'center', width: '100%'}}>
+					  <LoadingView loadingText="Please wait.."/>
+					 </Row>
 					  )}
 					  </Row>
 				    <Row>
@@ -308,12 +304,8 @@ const ConfirmRideScreen = (props) =>  {
 				   </Row>
 				   </>
 					  ) : (	
-					 <Row style={{flex: 1, marginTop: 10, marginLeft: 50,  alignContent: 'center', justifyContent: 'center', width: '100%'}}>
-					   <Animated.View
-                        style={{backgroundColor: 'rgb(101, 33, 33)',opacity: fadeAnim,width: "70%", padding: 50}}
-                       >
-                         <LoadingText>Finding drivers nearby</LoadingText>
-                       </Animated.View>
+					 <Row style={{flex: 1, marginTop: 10,  alignContent: 'center', justifyContent: 'center', width: '100%'}}>
+					  <LoadingView loadingText="Finding drivers nearby"/>
 					 </Row>
 					  )}
 			</Container>
