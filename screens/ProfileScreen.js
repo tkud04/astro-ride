@@ -168,6 +168,10 @@ export default class ProfileScreen extends React.Component {
 	  console.log(fav);
   }
 
+  _goToTest = (u) => {
+	  RootNavigation.navigate('Test', { u: u });
+  }
+
   _addFamily = () => {
 	  //console.log(fav);
   }
@@ -254,6 +258,20 @@ export default class ProfileScreen extends React.Component {
 					  >
 					  <PaymentActionText>Set up your family</PaymentActionText>
 					   <ProductDescription style={{}}>Pay for your loved ones and get notifications</ProductDescription>
+					  </PaymentButton>
+					</ProductInputWrapper>
+			     </Row>
+				 <HR color={AppStyles.themeColorTransparent}/>	
+			   <Row style={{flex: 1, marginTop: 15, width: '100%', flexDirection: 'column'}}>
+			     <PaymentTypeView>
+				     <PaymentType>Test</PaymentType>
+				   </PaymentTypeView>
+					<ProductInputWrapper style={{marginBottom: 10}}>
+					  <PaymentButton
+					   onPress={() => {this._goToTest()}}
+					  >
+					  <PaymentActionText>Test</PaymentActionText>
+					   <ProductDescription style={{}}>Run tests</ProductDescription>
 					  </PaymentButton>
 					</ProductInputWrapper>
 			     </Row>

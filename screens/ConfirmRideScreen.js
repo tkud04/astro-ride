@@ -34,7 +34,7 @@ let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 
 
 
- const _next = async (user) => {
+ const _next = async (user,paymentMethod,n) => {
 	// this.navv.navigate('ConfirmRide');  
 	let validationErrors = (paymentMethod === "none");
 	
@@ -50,7 +50,7 @@ let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 		dt.paymentMethod = paymentMethod;
 		dt.u = user;
 		
-	_takeSnapshot();
+	//_takeSnapshot();
 	helpers.confirmRide(dt);
 	}
 
@@ -77,7 +77,7 @@ let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
   
   
   const _takeSnapshot = () => {
-	if(map.current !== null){
+	if(map.current !== null && viewShot.current !== null){
 		  /**
 		  const snapshot = this.map.takeSnapshot({
 			  result: 'base64'
@@ -95,6 +95,7 @@ const ConfirmRideScreen = (props) =>  {
 	dt = props.route.params.dt;
 	navv = props.navigation;
 	viewShot = useRef();
+	let fadeInterval = useRef();
 	
 	
 	const [hasLocationPermissions, setHasLocationPermissions] = useState(false);
@@ -112,6 +113,8 @@ const ConfirmRideScreen = (props) =>  {
 	const [paymentMethods, setPaymentMethods] = useState([{key: 1,name: "Cash", value: "cash"}]);
 	const [cameraRollUri, setCameraRollUri] = useState(null);
 	const [isMapReady, setIsMapReady] = useState(false);
+	const [fadeAnim, setFadeAnim] = useState(new Animated.Value(0));
+	const [notConfirmed, setNotConfirmed] = useState(true);
 	
  
 	
@@ -183,6 +186,13 @@ const ConfirmRideScreen = (props) =>  {
 	setIsLoadingComplete(true);
 	
    },[isLoadingComplete ]);
+   
+   useEffect(() => {
+	  fadeInterval.current = setInterval(() => {
+		  if(fadeAnim >= 1) clearInterval(fadeInterval.current);
+		  else setFadeAnim(fadeAnim + 0.1);
+	  },1000);
+   },[]);
 	
     return (
 	 <UserContext.Consumer> 
@@ -191,8 +201,11 @@ const ConfirmRideScreen = (props) =>  {
 	        <Container>	     
 
 				   
+					  {notConfirmed ? (
+					  <>
+					   <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
 					  {isLoadingComplete ? (
-					 <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
+					   <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
 					 <ViewShot ref={ref => {viewShot = ref}} options={{ format: "png", quality: 0.9, result: "base64" }}>	
 				     <MapView 
 					   ref={ref => {
@@ -266,7 +279,7 @@ const ConfirmRideScreen = (props) =>  {
 					   </PaymentMethodWrapper>
 						</StatsView>
 						<SubmitButton
-				         onPress={() => {_next([user,paymentMethod])}}
+				         onPress={() => {_next([user,paymentMethod,navv]); setNotConfirmed(false);}}
 				         title="Submit"
                         >
                         <CButton title="CONFIRM RIDE" background="rgb(101, 33, 33)" color="#fff" />					   
@@ -282,6 +295,7 @@ const ConfirmRideScreen = (props) =>  {
 						</NoteView>					   
 				       </Row>
 					  )}
+					  </Row>
 				    <Row>
 				    <TestView>
 					 {cameraRollUri &&
@@ -292,7 +306,16 @@ const ConfirmRideScreen = (props) =>  {
                       />}
 					</TestView>
 				   </Row>
-				  		
+				   </>
+					  ) : (	
+					 <Row style={{flex: 1, marginTop: 10, marginLeft: 50,  alignContent: 'center', justifyContent: 'center', width: '100%'}}>
+					   <Animated.View
+                        style={{backgroundColor: 'rgb(101, 33, 33)',opacity: fadeAnim,width: "70%", padding: 50}}
+                       >
+                         <LoadingText>Finding drivers nearby</LoadingText>
+                       </Animated.View>
+					 </Row>
+					  )}
 			</Container>
 			</BackgroundImage>
 		 )}
@@ -532,4 +555,9 @@ const PaymentMethod = styled.Picker`
 	margin-bottom: 20px;
 `;
 
+const LoadingText = styled.Text`
+   font-size: 15px;
+   font-weight: bold;
+   color: #fff;
+`;
 

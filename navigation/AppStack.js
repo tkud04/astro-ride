@@ -12,6 +12,7 @@ import SetDestinationScreen from '../screens/SetDestinationScreen';
 import SetDestinationMapScreen from '../screens/SetDestinationMapScreen';
 import ConfirmRideScreen from '../screens/ConfirmRideScreen';
 import AccountSettingsScreen from '../screens/AccountSettingsScreen';
+import TestScreen from '../screens/TestScreen';
 
 
 /////////////////////////////////////////////////
@@ -90,6 +91,20 @@ let AppStack = () => (
 		            height: AppStyles.headerHeight - 200
 	              },
 	             header: () => <AppInputImageHeader r = {route} title="AstroRide" subtitle="Account Settings" sml={10}/>,
+	             headerTintColor: AppStyles.headerColor,
+	             headerLeft: null  
+				  })}
+	              
+                /> 		
+				<Stack.Screen
+                  name="Test"
+	              component={TestScreen}
+				  options={({route}) => ({
+					headerStyle: {
+		            backgroundColor: AppStyles.headerBackground,
+		            height: AppStyles.headerHeight - 200
+	              },
+	             header: () => <AppInputImageHeader r = {route} title="AstroRide" subtitle="Test" sml={10}/>,
 	             headerTintColor: AppStyles.headerColor,
 	             headerLeft: null  
 				  })}
