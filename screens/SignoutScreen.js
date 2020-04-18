@@ -10,6 +10,7 @@ import * as Permissions from 'expo-permissions';
 import {ThemeContext,UserContext} from '../MyContexts';
 import {ScrollView} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
+import * as RootNavigation from '../RootNavigation.js';
 
 import { Notifications } from 'expo';
 
@@ -43,25 +44,29 @@ export default class SignoutScreen extends React.Component {
 			 type: 'info'
 		 });
 		 
-		upp([{},""]);
-		
-     //Log user in
-	 /**
-		        helpers.logout((res) => {
-					
-					if(res.status == "ok"){						
-                       upp([{},""]);
-                        						
-					}
-					else{
-						showMessage({
-			              message: `Username or password incorrect, please try again.`,
-			              type: 'danger'
-		                });
-					}
-					this.state.loading = false;
-				});	
-	**/
+		helpers.logout((res) => {
+		 console.log("res: ", res);
+		 
+		 if(res.status == "ok"){
+			    showMessage({
+			      message: "See you later!",
+			      type: 'success'
+		        });
+		       // dt.tk = res.token;
+				
+		        //Log user out
+		        upp([{}]);  
+				//this.navv.navigate("Sign in");
+		   }
+		   else{
+			    showMessage({
+			      message: "There was a problem signing out, please try again later",
+			      type: 'danger'
+		        });
+		    
+		   }
+		   
+	 });
 	 
   }
   

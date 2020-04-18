@@ -89,7 +89,7 @@ constructor(props){
     let tttk  = (u[1] === "test") ? "testTTK" : uuser.tk;
 	let lloggedIn = (tttk !== null);
 	this.setState({user: uuser,tk: tttk,loggedIn: lloggedIn});
-	//console.log("user context updated with ",[uuser,lloggedIn]);
+	console.log("user context updated with ",[u,lloggedIn]);
   };
 
   render() {
@@ -122,7 +122,7 @@ constructor(props){
 				    <Drawer.Screen name="Sign out" component={SignoutStack}/>
 					</>
 				   ) : (
-				    <Drawer.Screen name="Sign in" component={SignoutStack} />
+				    <Drawer.Screen name="Sign in" component={AuthStack} />
 				   )}
            
                 </Drawer.Navigator>

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import CButton from '../components/CButton';
 import AppStyles from '../styles/AppStyles';
 import * as helpers from '../Helpers';
-import MapView,{Marker, Polyline} from 'react-native-maps';
+import MapView,{Marker, Polyline, Circle} from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import SvgIcon from '../components/SvgIcon';
 import LoadingView from '../components/LoadingView';
@@ -37,7 +37,7 @@ let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 
  const _next = async (arr) => {
 	 //user,pm,n/
-	 let u = arr[0], pm = arr[1], n = arr[2]; 
+	 let u = arr[0], pm = arr[1], n = arr[2], snc = arr[3]; 
 	// this.navv.navigate('ConfirmRide');  
 	let validationErrors = (pm === "none");
 	
@@ -57,7 +57,7 @@ let AnimatedPolyLine = Animated.createAnimatedComponent(Polyline);
 	//show LoadingView
 		
 	//_takeSnapshot();
-	helpers.confirmRide(dt);
+	helpers.confirmRide(dt,n,snc);
 	}
 
   }
@@ -217,6 +217,7 @@ const ConfirmRideScreen = (props) =>  {
 					   region={region}
                        onMapReady={() => {setIsMapReady(true); _focusMap()}}
    				     >
+					  
 				       <Marker
 					      coordinate={toMarkerCoords}
 						  title="Destination"
@@ -236,6 +237,11 @@ const ConfirmRideScreen = (props) =>  {
 		                 strokeColor={`rgba(0,0,0,${polylineOpacity})`} // fallback for when `strokeColors` is not supported by the map-provider	
 		                 strokeWidth={3}
 	                   />
+					   <Circle
+					    center={dt.origin.latlng}
+						radius={600}
+					   >
+					   </Circle>
 					 </MapView>	
 					 </ViewShot>
                     <WWrapper>
@@ -278,7 +284,7 @@ const ConfirmRideScreen = (props) =>  {
 					   </PaymentMethodWrapper>
 						</StatsView>
 						<SubmitButton
-				         onPress={() => {_next([user,paymentMethod,navv]); setNotConfirmed(false);}}
+				         onPress={() => {_next([user,paymentMethod,navv,setNotConfirmed]); setNotConfirmed(false);}}
 				         title="Submit"
                         >
                         <CButton title="CONFIRM RIDE" background="rgb(101, 33, 33)" color="#fff" />					   

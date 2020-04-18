@@ -165,7 +165,11 @@ export default class ProfileScreen extends React.Component {
   }
   
   _addSavedPlace = (fav) => {
-	  console.log(fav);
+	  if(!fav){
+		  fav = "random";
+	  }
+	  console.log("fav: ",fav);
+	  this.navv.navigate('AddLocation',{fav: fav});
   }
 
   _goToTest = (u) => {

@@ -93,7 +93,7 @@ export default class PaymentScreen extends React.Component {
 					  <PaymentButton
 					   onPress={() => {this._continue()}}
 					  >
-					  <PaymentActionText>Add Payment Method</PaymentActionText>
+					  <PaymentActionText>Add Profile</PaymentActionText>
 					  </PaymentButton>
 					</ProductInputWrapper>
                     </Row>	

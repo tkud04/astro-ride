@@ -9,6 +9,8 @@ import { Notifications } from 'expo';
 //import RNPaystack from 'react-native-paystack';
 import {showMessage, hideMessage} from 'react-native-flash-message';
  
+ const ENDPOINT = "https://ancient-springs-66698.herokuapp.com";
+ 
   export async function download(url){
 	 //result = await WebBrowser.openBrowserAsync(url);
 	 result = await Linking.openURL(url);
@@ -95,7 +97,7 @@ import {showMessage, hideMessage} from 'react-native-flash-message';
 
 
 export async function signup(pm, callback) {
-	const PUSH_ENDPOINT = 'https://gentle-ravine-38068.herokuapp.com/app/signup';
+	const PUSH_ENDPOINT = `${ENDPOINT}/app/signup`;
 	//const PUSH_ENDPOINT = encodeURIComponent(`https://www.eschoolng.net/mobileapp/expo_url.php?ppp=n`);
   const { status: existingStatus } = await Permissions.getAsync(
     Permissions.NOTIFICATIONS
@@ -153,7 +155,7 @@ export async function signup(pm, callback) {
 
 export async function login(data,callback)
 {
-	const PUSH_ENDPOINT = 'https://gentle-ravine-38068.herokuapp.com/app/login';
+	const PUSH_ENDPOINT = `${ENDPOINT}/app/login`;
 	 const { status: existingStatus } = await Permissions.getAsync(
     Permissions.NOTIFICATIONS
   );
@@ -1175,7 +1177,7 @@ export async function checkIfUserExists(num,callback){
 
 	let ret = {};
 
-	const PUSH_ENDPOINT = 'https://gentle-ravine-38068.herokuapp.com/app/check-number';
+	const PUSH_ENDPOINT = 'https://ancient-springs-66698.herokuapp.com/app/check-number';
 	
   let upu = PUSH_ENDPOINT + "?phone=" + num;
   return fetch(upu, {
@@ -1307,7 +1309,7 @@ export async function getDirections(data)
 
 export async function decodeDirectionPoints(str)
 {
-	const upu = `https://gentle-ravine-38068.herokuapp.com/app/decode-points?points=${str}`;
+	const upu = `https://ancient-springs-66698.herokuapp.com/app/decode-points?points=${str}`;
 	console.log("upu: ",upu);
   return fetch(upu, {
     method: 'GET'
@@ -1339,9 +1341,66 @@ export async function decodeDirectionPoints(str)
 
 export function getFare(){
 	
+}
+
+export async function getDriverLocations()
+{
+	const upu = `https://ancient-springs-66698.herokuapp.com/app/get-driver-locations`;
+	//console.log("upu: ",upu);
+  return fetch(upu, {
+    method: 'GET'
+  })
+  .then(response => {
+	    //console.log(response);
+         if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Couldn't get address, response returned with status " + response.status};
+		   }
+		   })
+    .catch(error => {
+		   console.log(`Failed to fetch  ${upu}: ${error}`);
+           return {status: "error:", message: "Couldn't fetch getAddress URL [HARD FAIL]"};		   
+	   })
+	   .then(res => {
+		   //console.log('Test', JSON.stringify(res));
+		   //console.log("res in 3rd then(): ",res);
+		   return res;
+		   
+	   }).catch(error => {
+		   console.log(`Unknown error: ${error}`);			
+	   });   
 } 
  
-export function confirmRide(dt){
-	console.log("dt: ",dt);
+export async function confirmRide(dt,nav,snc){
+	console.log("snc: ",snc);
+	
+	//we have dt, now fetch all drivers current latlng
+	let driverLocations = await getDriverLocations();
+	console.log("driverLocations: ",driverLocations);
+	
+	if(driverLocations.length > 0){
+		
+	}
+	else{
+		 showMessage({
+			 message: `No drivers found nearby`,
+			 type: 'danger'
+		 });
+		 
+		 snc(true);
+	}
+}
+
+export function arePointsNear(checkPoint, centerPoint, m) { // credits to user:69083
+  var km = m/1000;
+  var ky = 40000 / 360;
+  var kx = Math.cos(Math.PI * centerPoint.lat / 180.0) * ky;
+  var dx = Math.abs(centerPoint.lng - checkPoint.lng) * kx;
+  var dy = Math.abs(centerPoint.lat - checkPoint.lat) * ky;
+  return Math.sqrt(dx * dx + dy * dy) <= km;
 }
  
