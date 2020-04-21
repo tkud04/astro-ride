@@ -48,10 +48,11 @@ const CustomDrawerComponent = props => {
 				  <ProfileButton
 			  onPress={() => {_goToProfile(user)}}
 			 >
-            <View style={{ backgroundColor: AppStyles.headerBackground , paddingTop: 10, marginTop: -5}}>
-              <View style={{flexDirection: 'row', marginLeft: 10, marginBottom: 10, marginTop: 0}}>
+            <View style={{ backgroundColor: AppStyles.themeColor , marginTop: -5}}>
+              <View style={{ marginLeft: 5, marginBottom: 5, marginTop: 0}}>
 			    <Logo source={require('../assets/images/bg.jpg')}/>
-				<Username style={{ color: '#f9f9f9', marginTop: '15%', marginLeft: '5%', fontFamily: 'sans-serif-condensed' }}>{`${_getName(user)}`}</Username>
+				<Username style={{ color: '#f9f9f9', marginTop: 5, marginLeft: '5%', fontFamily: 'sans-serif-condensed' }}>{`${_getName(user)}`}</Username>
+				<Email style={{ color: '#f9f9f9', marginTop: 5, marginLeft: '5%', fontFamily: 'sans-serif-condensed' }}>{`${_getEmail(user)}`}</Email>
               </View>
             </View>
 			</ProfileButton>
@@ -81,11 +82,11 @@ export default CustomDrawerComponent;
 
 
 const Username = styled.Text`
-font-size: 20;
+font-size: 15;
 `;
 
 const Email = styled.Text`
-margin-bottom: 4px;
+margin-bottom: 5px;
 `;
 
 const Divider = styled.View`
@@ -116,11 +117,12 @@ const SvgView = styled.View`
 `;
 
 const Logo = styled.Image`
-           width: 80px;
-		   height: 80px;
+           width: 50px;
+		   height: 50px;
 		   background: black;
 		   border-radius: 44px;
-		   margin-top: 15px;
+		   margin-top: 10px;
+		   margin-left: 5px;
 `;
 
 const ProfileButton = styled.TouchableOpacity`
