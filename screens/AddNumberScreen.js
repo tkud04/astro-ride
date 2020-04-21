@@ -8,7 +8,7 @@ import * as FileSystem from 'expo-file-system';
 import TitleHeader from '../components/TitleHeader';
 import * as Permissions from 'expo-permissions';
 //import * as SMS from 'expo-sms';
-import {ScrollView} from 'react-native';
+import {ScrollView, Dimensions, ActivityIndicator, Animated} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 import { Notifications } from 'expo';
@@ -22,7 +22,9 @@ export default class AddNumberScreen extends React.Component {
 	
     this.state = { phoneBorderBottomColor: '#000',				  
 				   loading: false,
-				   phone: "",			 
+				   phone: "",
+                   isLoading: false,
+                   fadeAnim: new Animated.Value(0)				   
 				 };	
 				 
 	this.navv = null;
@@ -57,6 +59,7 @@ export default class AddNumberScreen extends React.Component {
 		    id: helpers.getUniqueID('user'),
 			code: helpers.getCode()
 	 };  
+	 this.setState({isLoading: true});
 	 
      helpers.sendSMSAsync(dt, this.navv);
 	}
@@ -66,6 +69,22 @@ export default class AddNumberScreen extends React.Component {
   render() {
 	 let navv = this.props.navigation;
 	  this.navv = navv;
+	  
+	  if(this.state.isLoading){
+	Animated.loop(
+	Animated.sequence([
+	Animated.timing(this.state.fadeAnim,{
+		toValue: 1,
+		duration: 1000
+	}),
+	Animated.timing(this.state.fadeAnim,{
+		toValue: 0,
+		duration: 1000
+	})
+	])
+	).start();
+    }
+	  
     return (
 	        <Container>	     
 
@@ -93,9 +112,21 @@ export default class AddNumberScreen extends React.Component {
 				   </Row>
 				  
 				   <Row style={{flex: 1,justifyContent: 'flex-end', width: '90%'}}>
-				   <NoteView style={{ alignItems: 'center', justifyContent: 'center'}}>
-				   <TitleHeader bc="rgb(101, 23, 33)" tc="rgb(101, 33, 33)" title="By continuing you may receive a verification SMS. Message and data rates may apply"/>
-                   </NoteView>
+				  
+					{this.state.isLoading ? (
+					 <NoteView style={{ justifyContent: 'center'}}>
+					   <Animated.View
+						  style={{opacity: this.state.fadeAnim}}
+					   >
+						<TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Processing.."/>
+				       </Animated.View>
+				     </NoteView>
+				   ) : (
+				    <NoteView style={{ alignItems: 'center', justifyContent: 'center'}}>
+				     <TitleHeader bc="rgb(101, 23, 33)" tc="rgb(101, 33, 33)" title="By continuing you may receive a verification SMS. Message and data rates may apply"/>
+					</NoteView>
+					)}
+				   
 				   <SubmitButton
 				       onPress={() => {this._continue()}}
 				       title="Submit"

@@ -10,6 +10,7 @@ import { Notifications } from 'expo';
 import {showMessage, hideMessage} from 'react-native-flash-message';
  
  const ENDPOINT = "https://ancient-springs-66698.herokuapp.com";
+ const KKEY = "AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM";
  
   export async function download(url){
 	 //result = await WebBrowser.openBrowserAsync(url);
@@ -1211,7 +1212,7 @@ export async function checkIfUserExists(num,callback){
 export async function getAddress(data)
 {
 	let latlng = `${data.latitude},${data.longitude}`;
-	const upu = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latlng}&key=AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM`;
+	const upu = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latlng}&key=${KKEY}`;
 	console.log("upu: ",upu);
   return fetch(upu, {
     method: 'GET'
@@ -1243,7 +1244,7 @@ export async function getAddress(data)
 
 export async function searchAddress(data)
 {
-	const upu = `https://maps.googleapis.com/maps/api/geocode/json?address=${data.address}&key=AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM`;
+	const upu = `https://maps.googleapis.com/maps/api/geocode/json?address=${data.address}&key=${KKEY}`;
 	console.log("upu: ",upu);
   return fetch(upu, {
     method: 'GET'
@@ -1277,7 +1278,7 @@ export async function getDirections(data)
 {
 	//console.log("data: ",data);
 	let from = `${data.from.latitude},${data.from.longitude}`, to = `${data.to.latitude},${data.to.longitude}`;
-	const upu = `https://maps.googleapis.com/maps/api/directions/json?origin=${from}&destination=${to}&key=AIzaSyDq8YO8Juh__b4bhRCoSbDu3gPS407qjlM`;
+	const upu = `https://maps.googleapis.com/maps/api/directions/json?origin=${from}&destination=${to}&key=${KKEY}`;
 	console.log("upu: ",upu);
   return fetch(upu, {
     method: 'GET'
@@ -1403,4 +1404,59 @@ export function arePointsNear(checkPoint, centerPoint, m) { // credits to user:6
   var dy = Math.abs(centerPoint.lat - checkPoint.lat) * ky;
   return Math.sqrt(dx * dx + dy * dy) <= km;
 }
- 
+
+/**
+dt here:  Object {
+  "fav": "work",
+  "formattedAddress": "50 Osborne Rd Ikoyi Lagos",
+  "markerCoords": Object {
+    "latitude": 6.459780299999999,
+    "longitude": 3.4329772,
+  },
+}
+**/
+
+export async function addLocation(dt,nav){
+	const upu = `https://ancient-springs-66698.herokuapp.com/app/add-location?id=${dt.user.email}&fav=${dt.fav}&address=${dt.formattedAddress}&lat=${dt.markerCoords.latitude}&lng=${dt.markerCoords.longitude}`;
+	console.log("upu: ", upu);
+	
+	return fetch(upu, {
+    method: 'GET'
+  })
+  .then(response => {
+	    //console.log(response);
+         if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Couldn't add location, response returned with status " + response.status};
+		   }
+		   })
+    .catch(error => {
+		   console.log(`Failed to fetch  ${upu}: ${error}`);
+           return {status: "error:", message: "Couldn't fetch addLocation URL [HARD FAIL]"};		   
+	   })
+	   .then(res => {
+		   //console.log('Test', JSON.stringify(res));
+		   //console.log("res in 3rd then(): ",res);
+		   //return res;
+		   console.log("add location returned: ", res);
+		   if(res.status == "ok"){
+			    showMessage({
+			      message: `Location saved!`,
+			      type: 'success'
+		        });
+			nav.navigate('Profile');
+		   }
+		   else if(res.status == "error"){
+			    showMessage({
+			     message: `An error occured: ${res.message}`,
+			     type: 'danger'
+		        });
+		   }
+	   }).catch(error => {
+		   console.log(`Unknown error: ${error}`);			
+	   });   
+}

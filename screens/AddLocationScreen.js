@@ -17,31 +17,8 @@ import { Notifications } from 'expo';
 
 const { width, height } = Dimensions.get('window');
 
-let dt = {location: {}}, navv = null;
+let dt = {}, navv = null;
 
-
-
- const _next = async (arr) => {
-	 //user,pm,n/
-	 let u = arr[0], pm = arr[1], n = arr[2], snc = arr[3]; 
-	// this.navv.navigate('ConfirmRide');  
-	let validationErrors = (pm === "none");
-	
-	if(validationErrors){
-		if(pm === "none"){
-			 showMessage({
-			 message: "Please select your payment method",
-			 type: 'danger'
-		 });
-		}
-	}
-	else{
-		console.log("dt: ",dt);
-	
-	}
-
-  }
-  
   
   const _launchDrawer = () => {
 	navv.toggleDrawer();  
@@ -53,27 +30,44 @@ let dt = {location: {}}, navv = null;
 const AddLocationScreen = (props) =>  { 
    
 	navv = props.navigation;
-	fav = props.fav;
+	fav = props.route.params.fav;
+	let favName = "";
+	switch(fav){
+		case "home":
+		 favName = "Home";
+		break;
+		
+		case "work":
+		 favName = "Work";
+		break;
+		
+		default:
+		 favName = "";
+	}
 	
 	const [nameBorderColor, setNameBorderColor] = useState('#000');
 	const [locationBorderColor, setLocationBorderColor] = useState('#000');
-	const [name, setName] = useState(null);
+	const [name, setName] = useState(favName);
 	const [location, setLocation] = useState(null);
 	const [address, setAddress] = useState("");
 	const [markerCoords, setMarkerCoords] = useState(null);
 	const [hasLocation, setHasLocation] = useState(false);
 	const [hasLocationPermissions, setHasLocationPermissions] = useState(false);
+	const [isLoadingComplete, setIsLoadingComplete] = useState(false);
+	const [fadeAnim] = useState(new Animated.Value(0));
 	
  
-   const  _setLocationText = async (hasLocation) => {
+   const  _setLocationText = async (u, hasLocation) => {
 			if(hasLocation){
-			 dt.location = {
-		      latlng: markerCoords,
+			 dt = {
+			  user: u,
+		      markerCoords: markerCoords,
+		      fav: fav,
 		      formattedAddress: address
 			}
-			dt.name = name;
+			setIsLoadingComplete(true);
 			 console.log("dt here: ",dt);
-			  	
+			  	helpers.addLocation(dt,navv);
 			}
 			else{
 				_setLocation(address);
@@ -82,6 +76,7 @@ const AddLocationScreen = (props) =>  {
  
  const _setLocation = async (data) => {
    console.log("data: ",data);
+   setIsLoadingComplete(true);
    if(hasLocationPermissions){
 	   let dest = data.coordinate;
 	   let address = await helpers.searchAddress({address: data});
@@ -108,6 +103,7 @@ const AddLocationScreen = (props) =>  {
 			});	  	  
 	  }
 	  setHasLocation(true);
+	  setIsLoadingComplete(false);
    }
    else{
 	   showMessage({
@@ -118,10 +114,50 @@ const AddLocationScreen = (props) =>  {
    // this.setState({region: mapRegion });
   }
   
-const _getLocationAsync = async () => {
+const _setDestinationMap = () => {
+	  console.log("fav: ",fav);
+	  let origin = {
+		  latlng: markerCoords,
+		  formattedAddress: address
+	  };
+	  
+	  console.log("origin: ",origin);
+	  navv.navigate('AddLocationMap',{
+		  fav: fav,
+		  origin: origin
+		  });
+  }
+ 
+ const  _getLocationAsync = async () => {
 	  const { status } = await Location.requestPermissionsAsync();
     if (status === 'granted') {
-	   setHasLocationPermissions(true);
+      setHasLocationPermissions(true);
+	  let loc = await Location.getCurrentPositionAsync({});
+	  console.log("Current position: ",loc);
+	  let addr = await helpers.getAddress({latitude: loc.coords.latitude, longitude: loc.coords.longitude});
+	  console.log("Address: ",addr);
+	  
+	  if(addr.status === "error"){
+		   //this.setState({ tryAgain: true});
+	  }
+	  else{
+		  //the results object is an array. we are using the first object returned ( of type ROOFTOP)
+	  let rooftop = addr.results[0],addressComponents = rooftop.address_components;
+	  let formattedAddress = addressComponents[0].short_name;
+	 
+	  for(let i = 1; i < 4; i++){
+		  formattedAddress += " " + addressComponents[i].short_name;
+	  }
+	  
+	  console.log("Formatted address: ",formattedAddress);
+	  setAddress(formattedAddress);
+	  
+	  setMarkerCoords({
+		     latitude: loc.coords.latitude,
+		     longitude: loc.coords.longitude
+		    });
+	 
+	 }
     }
 	else{
 		showMessage({
@@ -129,6 +165,7 @@ const _getLocationAsync = async () => {
 			 type: 'warning'
 		 });
 	}
+	
   }
  
 	
@@ -137,6 +174,23 @@ const _getLocationAsync = async () => {
 		 
 		 _getLocationAsync();
    },[]);
+   
+   useEffect(() => {
+	if(isLoadingComplete){
+	Animated.loop(
+	Animated.sequence([
+	Animated.timing(fadeAnim,{
+		toValue: 1,
+		duration: 1000
+	}),
+	Animated.timing(fadeAnim,{
+		toValue: 0,
+		duration: 1000
+	})
+	])
+	).start();
+    }
+   },[isLoadingComplete]);
   
 	
     return (
@@ -144,13 +198,23 @@ const _getLocationAsync = async () => {
    {({user,up,loggedIn}) => (
 	        <Container>				
 					<Row style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20, width: '100%',backgroundColor: 'rgba(0,0,0,0)'}}>
-					   <TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Add Favorite"/>	
+						{isLoadingComplete ? (
+						<Animated.View
+						  style={{opacity: fadeAnim}}
+						 >
+						<TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Processing.."/>
+						</Animated.View>
+					   
+						) : (
+						 <TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Add Favorite"/>
+						)}
 					</Row>
-					<Row style={{ marginTop: 5, width: '100%',backgroundColor: 'rgba(0,0,0,0)'}}>
+					<Row style={{ marginTop: 5, marginBottom: 10, width: '100%',backgroundColor: 'rgba(0,0,0,0)'}}>
                     <InputWrapper>
 					<InputWrapperControl
 					style={{borderColor: nameBorderColor,width: '90%'}}
 				     placeholder="Name"
+					 value={name}
 				     onChangeText={text => {
 						setName(text);
 					 }}
@@ -173,16 +237,16 @@ const _getLocationAsync = async () => {
 					 onBlur={() => {
 						setLocationBorderColor("#eee");						
 					 }}
-					 onEndEditing={() => {_setLocationText(false)}}
+					 onEndEditing={() => {_setLocationText(user,false)}}
 					/>
 					</InputWrapper>		 
 					</Row>
 					
 					 {hasLocation ? (
-					 <Row style={{ marginTop: 5, width: '100%', justifyContent: 'center',backgroundColor: 'rgba(0,0,0,0)'}}>
+					 <Row style={{ marginTop: 5, marginBottom: 10, width: '100%', justifyContent: 'center',backgroundColor: 'rgba(0,0,0,0)'}}>
 					 <>
 					<AddOnMapButton
-				         onPress={() => {_setLocationText(true)}}
+				         onPress={() => {_setLocationText(user,true)}}
 				         title="Submit"
                         >
                      <AddOnMapWrapper>

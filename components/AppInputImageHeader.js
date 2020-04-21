@@ -27,7 +27,7 @@ return (
     {
 		props.xml && <SvgIcon xml={helpers.insertAppStyle(props.xml)} w={60} h={40}/>
 	}
-	   <Title style={{fontSize: 12}}>{props.title}</Title>
+	   <Title style={{fontSize: 12}}></Title>
   </SvgView>
   </ButtonsView>
   

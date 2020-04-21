@@ -7,7 +7,7 @@ import * as helpers from '../Helpers';
 import * as FileSystem from 'expo-file-system';
 import TitleHeader from '../components/TitleHeader';
 import * as Permissions from 'expo-permissions';
-import {ScrollView} from 'react-native';
+import {ScrollView, Dimensions, ActivityIndicator, Animated} from 'react-native';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 import { Notifications } from 'expo';
@@ -29,7 +29,9 @@ export default class VerifyNumberScreen extends React.Component {
                     codeThree: '0',					
                     codeFour: '0',					
 				   loading: false,		 
-				   showLoading: false,		 
+				   showLoading: false,
+                    isLoading: false,
+                   fadeAnim: new Animated.Value(0)				   
 				 };	
 				 
 	this.navv = null;
@@ -74,6 +76,7 @@ export default class VerifyNumberScreen extends React.Component {
 			 message: `Verifying`,
 			 type: 'info'
 		 });
+	  this.setState({isLoading: true});
 		  helpers.checkIfUserExists(this.dt.to,(res) => {
 			  console.log("res: ",res);
 			  if(res.status === "ok"){
@@ -104,14 +107,40 @@ export default class VerifyNumberScreen extends React.Component {
   render() {
 	 let navv = this.props.navigation;
 	  this.navv = navv;
+	  
+	  if(this.state.isLoading){
+	Animated.loop(
+	Animated.sequence([
+	Animated.timing(this.state.fadeAnim,{
+		toValue: 1,
+		duration: 1000
+	}),
+	Animated.timing(this.state.fadeAnim,{
+		toValue: 0,
+		duration: 1000
+	})
+	])
+	).start();
+    }
+	  
     return (
 	       <BackgroundImage source={require('../assets/images/bg.jpg')}>
 	        <Container>	     
 
 				   <Row style={{flex: 1, marginTop: 10, width: '100%'}}>
-				   <NoteView style={{ alignItems: 'center', justifyContent: 'center'}}>
-				   <TitleHeader bc="rgb(101, 23, 33)" tc="rgb(101, 33, 33)" title="Enter the 4-digit code sent to your mobile number:"/>
-                   </NoteView>
+				   {this.state.isLoading ? (
+					 <NoteView style={{ justifyContent: 'center'}}>
+					   <Animated.View
+						  style={{opacity: this.state.fadeAnim}}
+					   >
+						<TitleHeader bc="rgb(101, 33, 33)" tc="rgb(101, 33, 33)" title="Processing.."/>
+				       </Animated.View>
+				     </NoteView>
+				   ) : (
+				    <NoteView style={{ alignItems: 'center', justifyContent: 'center'}}>
+				     <TitleHeader bc="rgb(101, 23, 33)" tc="rgb(101, 33, 33)" title="Enter the 4-digit code sent to your mobile number:"/>
+					</NoteView>
+					)}
  					 <ProductInputWrapper style={{marginTop: 20,flexDirection: 'row',width: '100%'}}>
 					
 				    <ProductInput

@@ -70,7 +70,7 @@ export default class ProfileScreen extends React.Component {
 	  
 	  
 	    updateState = (dt) => {
-			 console.log("user: ",dt);
+			// console.log("user: ",dt);
 			  this.state.fname = dt.fname;
 			  this.state.lname = dt.lname;
 			  this.state.email = dt.email;

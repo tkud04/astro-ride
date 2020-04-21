@@ -9,6 +9,7 @@ import AppStyles from '../styles/AppStyles';
 import DashboardScreen from '../screens/DashboardScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AddLocationScreen from '../screens/AddLocationScreen';
+import AddLocationMapScreen from '../screens/AddLocationMapScreen';
 import SetDestinationScreen from '../screens/SetDestinationScreen';
 import SetDestinationMapScreen from '../screens/SetDestinationMapScreen';
 import ConfirmRideScreen from '../screens/ConfirmRideScreen';
@@ -90,7 +91,21 @@ let AppStack = () => (
 		            backgroundColor: AppStyles.headerBackground,
 		            height: AppStyles.headerHeight - 200
 	              },
-	             header: () => <AppInputImageHeader r = {route} title="AstroRide" subtitle="Add favorite" sml={10}/>,
+	             header: () => <AppInputImageHeader r = {route} title="AstroRide" subtitle="" sml={10}/>,
+	             headerTintColor: AppStyles.headerColor,
+	             headerLeft: null  
+				  })}
+	              
+                /> 
+				<Stack.Screen
+                  name="AddLocationMap"
+	              component={AddLocationMapScreen}
+				  options={({route}) => ({
+					headerStyle: {
+		            backgroundColor: AppStyles.headerBackground,
+		            height: AppStyles.headerHeight - 200
+	              },
+	             header: () => <AppInputImageHeader r = {route} title="AstroRide" subtitle="" sml={10}/>,
 	             headerTintColor: AppStyles.headerColor,
 	             headerLeft: null  
 				  })}
