@@ -11,7 +11,7 @@ import SvgIcon from '../components/SvgIcon';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
-import {ScrollView, Dimensions} from 'react-native';
+import {ScrollView, Dimensions, ActivityIndicator, Animated} from 'react-native';
 import * as RootNavigation from '../RootNavigation.js';
 import {ThemeContext,UserContext} from '../MyContexts';
 import {showMessage, hideMessage} from 'react-native-flash-message';
@@ -24,7 +24,7 @@ export default class ProfileScreen extends React.Component {
     super(props);
 	helpers._getPermissionAsync('camera roll');
 	this.props.navigation.setParams({launchDrawer: this.launchDrawer});	
-	//this.dt = props.navigation.state.params.dt;
+	this.u = props.route.params.u;
 	
 	
     this.state = { 
@@ -42,10 +42,18 @@ export default class ProfileScreen extends React.Component {
 					confirmPassword: "",
 					img: null,
 					homeButtonText: "Add home",
-					workButtonText: "Add work"
+					locations: [],
+					homeLocation: {},
+					workLocation: {},
+					workButtonText: "Add work",
+					hasSavedLocations: false,
+					isLoading: false,
+					savedLocations: [],
+					fadeAnim: new Animated.Value(0)		
 				 };	
 				 
 	this.navv = null;
+
   }
   
     launchDrawer = () => {
@@ -75,6 +83,50 @@ export default class ProfileScreen extends React.Component {
 			  this.state.lname = dt.lname;
 			  this.state.email = dt.email;
 			  this.state.phone = dt.phone;
+  }
+  
+  getLocationss = (u) => {
+        this.setState({isLoading: true});
+		  helpers.getLocations(u).then(res => {
+		   //console.log('Test', JSON.stringify(res));
+		   //console.log("res in 3rd then(): ",res);
+		   //return res;
+		   console.log("get location returned: ", res);
+		   if(res.length > 0){
+			  //this.state.locations = res;
+              
+              //check if Home and Work locations are present, if not use default values
+              for(let x = 0; x < res.length; x++){				 
+				  if(res[x].fav === "home" || res[x].fav === "work"){
+					  if(res[x].fav == "home"){
+						  console.log("home: ",res[x]);
+						 this.setState({homeButtonText: res[x].address});
+						 this.setState({homeLocation: res[x]});
+					  }
+					  if(res[x].fav == "work"){
+						  console.log("work: ",res[x]);
+						 this.setState({workButtonText: res[x].address});
+						 this.setState({workLocation: res[x]});
+					  }
+				  }
+				  else{
+					  this.state.locations.push(res[x]);
+				  }
+			  }			  
+		   }
+		   else{
+			   /**
+			    showMessage({
+			     message: `An error occured: ${res.message}`,
+			     type: 'danger'
+		        });
+			  **/
+		   }
+	   }).catch(error => {
+		   console.log(`Unknown error: ${error}`);			
+	   }); 
+		  this.state.hasSavedLocations = true;
+		  this.setState({isLoading: false});
   }
   
     addImage = async () => {
@@ -165,19 +217,27 @@ export default class ProfileScreen extends React.Component {
   }
   
   _addSavedPlace = (fav) => {
+	  let loc = {};
 	  if(!fav){
 		  fav = "random";
 	  }
-	  console.log("fav: ",fav);
-	  this.navv.navigate('AddLocation',{fav: fav});
+	  
+	  switch(fav){
+		  case "home":
+		   loc = this.state.homeLocation;
+		  break;
+		  
+		  case "work":
+		   loc = this.state.workLocation;
+		  break;
+	  }
+	  
+	  console.log("fav,loc: ",[fav,loc]);
+	  this.navv.navigate('AddLocation',{fav: fav,loc: loc});
   }
 
   _goToTest = (u) => {
 	  RootNavigation.navigate('Test', { u: u });
-  }
-
-  _addFamily = () => {
-	  //console.log(fav);
   }
 
   _goToAccountSettings = (u) => {
@@ -187,6 +247,21 @@ export default class ProfileScreen extends React.Component {
   render() {
 	 let navv = this.props.navigation;
 	  this.navv = navv;
+	  
+  if(this.state.isLoading){
+	Animated.loop(
+	Animated.sequence([
+	Animated.timing(this.state.fadeAnim,{
+		toValue: 1,
+		duration: 1000
+	}),
+	Animated.timing(this.state.fadeAnim,{
+		toValue: 0,
+		duration: 1000
+	})
+	])
+	).start();
+    }
 
     return (
 	      <ThemeContext.Consumer>
@@ -194,6 +269,10 @@ export default class ProfileScreen extends React.Component {
    <UserContext.Consumer>
    {({user,up,loggedIn}) => {
 	   this.updateState(user);
+	   if(!this.state.hasSavedLocations){
+		   //console.log("user,u: ",[user,this.u]); 	   
+		   this.getLocationss(user);
+	   }
 	   return (
 	     <ScrollView>
 	        <Container>
@@ -214,9 +293,19 @@ export default class ProfileScreen extends React.Component {
 			     </Row>
 			   <HR color={AppStyles.themeColorTransparent}/>
 			   <Row style={{flex: 1, marginTop: 15, width: '100%', flexDirection: 'column'}}>
-			     <PaymentTypeView>
-				     <PaymentType>Favorites</PaymentType>
+			   {this.state.isLoading ? (
+			   <PaymentTypeView>
+                 <Animated.View
+						  style={{opacity: this.state.fadeAnim}}
+				  >			   
+				     <PaymentType>Loading..</PaymentType>
+				  </Animated.View>
 				   </PaymentTypeView>
+			   ) : (
+			     <PaymentTypeView>	     
+				     <PaymentType>Saved Locations</PaymentType>
+				   </PaymentTypeView>
+			   )}
 				    <ProductInputWrapper>
 					 <PaymentTypeWrapper>
 					   <PaymentTypeLogo>

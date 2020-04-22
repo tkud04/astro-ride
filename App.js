@@ -116,13 +116,13 @@ constructor(props){
 			    <Drawer.Navigator initialRouteName='Dashboard' drawerContent={props => (<CustomDrawerComponent {...props}/>)}>
 				   {this.state.loggedIn ? (
 				   <>
-				    <Drawer.Screen name="Dashboard" component={AppStack} />
-				    <Drawer.Screen name="Trips" component={TripsStack} />
-				    <Drawer.Screen name="Payment" component={PaymentStack} />
-				    <Drawer.Screen name="Sign out" component={SignoutStack}/>
+				    <Drawer.Screen name="Dashboard" component={AppStack} options={{drawerIcon: () => <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardHouse)} w={40} h={20}/>}} />
+				    <Drawer.Screen name="Trips" component={TripsStack} options={{drawerIcon: () => <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.logoCar)} w={40} h={20}/>}} />
+				    <Drawer.Screen name="Payment" component={PaymentStack} options={{drawerIcon: () => <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardWallet)} w={40} h={20}/>}} />
+				    <Drawer.Screen name="Sign out" component={SignoutStack} options={{drawerIcon: () => <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardSignOut)} w={40} h={20}/>}} />
 					</>
 				   ) : (
-				    <Drawer.Screen name="Sign in" component={AuthStack} />
+				    <Drawer.Screen name="Sign in" component={AuthStack} options={{drawerIcon: () => <SvgIcon xml={helpers.insertAppStyle(AppStyles.svg.cardSignIn)} w={40} h={20}/>}} />
 				   )}
            
                 </Drawer.Navigator>

@@ -30,8 +30,9 @@ let dt = {}, navv = null;
 const AddLocationScreen = (props) =>  { 
    
 	navv = props.navigation;
-	fav = props.route.params.fav;
-	let favName = "";
+	let fav = props.route.params.fav;
+	let loc = props.route.params.loc;
+	let favName = "", favAddr = "", favCoords = {};
 	switch(fav){
 		case "home":
 		 favName = "Home";
@@ -44,19 +45,28 @@ const AddLocationScreen = (props) =>  {
 		default:
 		 favName = "";
 	}
+	//console.log("loc: ", loc);
+	 if(Object.keys(loc).length > 0){
+		 favAddr = loc.address;
+		 favCoords = helpers.splitLatLng(loc.latlng);
+	 }
+	 else{
+		 
+	 }
+	
 	
 	const [nameBorderColor, setNameBorderColor] = useState('#000');
 	const [locationBorderColor, setLocationBorderColor] = useState('#000');
 	const [name, setName] = useState(favName);
 	const [location, setLocation] = useState(null);
-	const [address, setAddress] = useState("");
-	const [markerCoords, setMarkerCoords] = useState(null);
+	const [address, setAddress] = useState(favAddr);
+	const [markerCoords, setMarkerCoords] = useState(favCoords);
 	const [hasLocation, setHasLocation] = useState(false);
 	const [hasLocationPermissions, setHasLocationPermissions] = useState(false);
 	const [isLoadingComplete, setIsLoadingComplete] = useState(false);
 	const [fadeAnim] = useState(new Animated.Value(0));
 	
- 
+
    const  _setLocationText = async (u, hasLocation) => {
 			if(hasLocation){
 			 dt = {
@@ -132,6 +142,7 @@ const _setDestinationMap = () => {
 	  const { status } = await Location.requestPermissionsAsync();
     if (status === 'granted') {
       setHasLocationPermissions(true);
+	  /**
 	  let loc = await Location.getCurrentPositionAsync({});
 	  console.log("Current position: ",loc);
 	  let addr = await helpers.getAddress({latitude: loc.coords.latitude, longitude: loc.coords.longitude});
@@ -158,6 +169,7 @@ const _setDestinationMap = () => {
 		    });
 	 
 	 }
+	 **/
     }
 	else{
 		showMessage({
@@ -228,6 +240,7 @@ const _setDestinationMap = () => {
 					<InputWrapperControl
 					style={{borderColor: locationBorderColor,width: '90%'}}
 				     placeholder="Address"
+					 value={address}
 				     onChangeText={text => {
 						setAddress(text);
 					 }}

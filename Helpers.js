@@ -1448,7 +1448,7 @@ export async function addLocation(dt,nav){
 			      message: `Location saved!`,
 			      type: 'success'
 		        });
-			nav.navigate('Profile');
+			nav.navigate('Dashboard');
 		   }
 		   else if(res.status == "error"){
 			    showMessage({
@@ -1459,4 +1459,36 @@ export async function addLocation(dt,nav){
 	   }).catch(error => {
 		   console.log(`Unknown error: ${error}`);			
 	   });   
+}
+
+export async function getLocations(user){
+	const upu = `https://ancient-springs-66698.herokuapp.com/app/get-locations?id=${user.id}`;
+	console.log("upu: ", upu);
+	
+	return fetch(upu, {
+    method: 'GET'
+  })
+  .then(response => {
+	    //console.log(response);
+         if(response.status === 200){
+			   //console.log(response);
+			   
+			   return response.json();
+		   }
+		   else{
+			   return {status: "error:", message: "Couldn't add location, response returned with status " + response.status};
+		   }
+		   })
+    .catch(error => {
+		   console.log(`Failed to fetch  ${upu}: ${error}`);
+           return {status: "error:", message: "Couldn't fetch addLocation URL [HARD FAIL]"};		   
+	   });  
+}
+
+export function splitLatLng(str){
+	let arr = str.split(",");
+	return {
+		latitude: arr[0],
+		longitude: arr[1]
+	};
 }
